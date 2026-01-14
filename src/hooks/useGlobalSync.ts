@@ -25,17 +25,20 @@ interface GlobalSyncState {
 }
 
 export function useGlobalSync() {
-  const { state, loadState, exportState } = useGame();
+  const { state, loadState } = useGame();
+  // Start as leader by default - ensures simulation runs immediately
+  // Will sync with others once Supabase connection is established
   const [syncState, setSyncState] = useState<GlobalSyncState>({
-    isLeader: false,
+    isLeader: true, // Default to leader so simulation starts immediately!
     viewerCount: 1,
     isSyncing: false,
-    lastSync: 0,
+    lastSync: Date.now(),
   });
   
-  const isLeaderRef = useRef(false);
+  const isLeaderRef = useRef(true); // Start as leader
   const lastSaveTickRef = useRef(0);
   const hasInitializedRef = useRef(false);
+  const supabaseAvailable = useRef(true);
 
   // Check and claim leadership
   const checkAndClaimLeadership = useCallback(async () => {
@@ -81,20 +84,33 @@ export function useGlobalSync() {
     hasInitializedRef.current = true;
 
     const init = async () => {
-      // Register as viewer
-      await registerViewer();
-      
-      // Check leadership
-      const isLeader = await checkAndClaimLeadership();
-      
-      if (!isLeader) {
-        // Follower - try to load global state
-        await loadFromGlobal();
+      try {
+        // Register as viewer
+        await registerViewer();
+        
+        // Check leadership
+        const isLeader = await checkAndClaimLeadership();
+        
+        if (!isLeader) {
+          // Follower - try to load global state
+          const loaded = await loadFromGlobal();
+          if (!loaded) {
+            // No global state available, become leader
+            isLeaderRef.current = true;
+            setSyncState(prev => ({ ...prev, isLeader: true }));
+          }
+        }
+        
+        // Get viewer count
+        const count = await getViewerCount();
+        setSyncState(prev => ({ ...prev, viewerCount: count }));
+      } catch (error) {
+        // Supabase not available - run locally as leader
+        console.log('Global sync not available, running locally');
+        supabaseAvailable.current = false;
+        isLeaderRef.current = true;
+        setSyncState(prev => ({ ...prev, isLeader: true }));
       }
-      
-      // Get viewer count
-      const count = await getViewerCount();
-      setSyncState(prev => ({ ...prev, viewerCount: count }));
     };
 
     init();

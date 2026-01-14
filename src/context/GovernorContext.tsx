@@ -74,7 +74,20 @@ export function GovernorProvider({ children }: { children: React.ReactNode }) {
   
   // Make a governance decision
   const makeDecision = useCallback(async () => {
-    if (isThinkingRef.current || !config.apiKey) {
+    if (isThinkingRef.current) {
+      return;
+    }
+    
+    if (!config.apiKey) {
+      console.warn('⚠️ Claude API key not configured. Set NEXT_PUBLIC_CLAUDE_API_KEY environment variable.');
+      // Add error event so user can see it
+      addEvent({
+        id: `no-api-key-${Date.now()}`,
+        type: 'error',
+        message: 'Claude API key not configured. Set NEXT_PUBLIC_CLAUDE_API_KEY in environment variables.',
+        timestamp: Date.now(),
+        tick: latestStateRef.current.tick,
+      });
       return;
     }
     
