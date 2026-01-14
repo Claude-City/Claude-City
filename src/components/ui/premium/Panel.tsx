@@ -8,9 +8,10 @@ interface PanelProps {
   className?: string;
   noPadding?: boolean;
   hover?: boolean;
+  style?: React.CSSProperties;
 }
 
-export function Panel({ children, className, noPadding = false, hover = true }: PanelProps) {
+export function Panel({ children, className, noPadding = false, hover = true, style }: PanelProps) {
   return (
     <div
       className={cn(
@@ -25,6 +26,7 @@ export function Panel({ children, className, noPadding = false, hover = true }: 
         !noPadding && 'p-4',
         className
       )}
+      style={style}
     >
       {children}
     </div>
