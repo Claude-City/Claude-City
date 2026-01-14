@@ -18,7 +18,7 @@ import { SimulationEventFeed } from './SimulationEventFeed';
 import { DisasterPanel } from './DisasterPanel';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Panel, LineworkOverlay, ShimmerOverlay } from '@/components/ui/premium';
-import { Brain, Clock, Users, Radio, Zap } from 'lucide-react';
+import { Brain, Clock, Users, Radio, Zap, Play, FastForward, Pause } from 'lucide-react';
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -167,8 +167,42 @@ export function SimulationView({ initialIsLeader = false }: SimulationViewProps)
             </div>
           </div>
           
-          {/* Right - Status */}
+          {/* Right - Status & Controls */}
           <div className="flex items-center gap-4">
+            {/* Host Speed Controls - only visible to host */}
+            {isLeader && (
+              <div 
+                className="flex items-center gap-1 px-2 py-1 rounded-lg"
+                style={{ 
+                  background: 'var(--bg-2)',
+                  border: '1px solid var(--panel-border)'
+                }}>
+                <span className="text-[9px] uppercase tracking-wider mr-2" style={{ color: 'var(--text-2)' }}>
+                  Speed
+                </span>
+                {[
+                  { speed: 0, icon: Pause, label: 'Pause' },
+                  { speed: 1, icon: Play, label: '1x' },
+                  { speed: 2, icon: FastForward, label: '2x' },
+                  { speed: 3, icon: FastForward, label: '3x' },
+                ].map(({ speed, icon: Icon, label }) => (
+                  <button
+                    key={speed}
+                    onClick={() => setSpeed(speed as 0 | 1 | 2 | 3)}
+                    className="p-1.5 rounded transition-all"
+                    style={{ 
+                      background: state.speed === speed ? 'rgba(231, 210, 178, 0.15)' : 'transparent',
+                      border: state.speed === speed ? '1px solid rgba(231, 210, 178, 0.3)' : '1px solid transparent',
+                      color: state.speed === speed ? 'var(--gold-0)' : 'var(--text-2)'
+                    }}
+                    title={label}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                  </button>
+                ))}
+              </div>
+            )}
+            
             {/* Viewers */}
             <div className="flex items-center gap-2" style={{ color: 'var(--text-1)' }}>
               <Users className="w-4 h-4" style={{ color: 'var(--gold-1)' }} />
