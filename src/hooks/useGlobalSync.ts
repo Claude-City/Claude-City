@@ -41,11 +41,11 @@ export function useGlobalSync() {
   const supabaseAvailable = useRef(true);
 
   // Check and claim leadership
-  const checkAndClaimLeadership = useCallback(async () => {
-    const { isLeader } = await checkLeadership();
-    isLeaderRef.current = isLeader;
-    setSyncState(prev => ({ ...prev, isLeader }));
-    return isLeader;
+  const checkAndClaimLeadership = useCallback(async (): Promise<boolean> => {
+    const result = await checkLeadership();
+    isLeaderRef.current = result.isLeader;
+    setSyncState(prev => ({ ...prev, isLeader: result.isLeader }));
+    return result.isLeader;
   }, []);
 
   // Save state to global (leader only)
@@ -100,8 +100,8 @@ export function useGlobalSync() {
           setSyncState(prev => ({ ...prev, isLeader: false, lastSync: Date.now() }));
           
           // Check if we should take over as leader
-          const { isLeader } = await checkAndClaimLeadership();
-          if (isLeader) {
+          const leaderCheck = await checkAndClaimLeadership();
+          if (leaderCheck) {
             console.log('👑 Becoming leader of the simulation');
             isLeaderRef.current = true;
             setSyncState(prev => ({ ...prev, isLeader: true }));
