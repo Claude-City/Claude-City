@@ -34,6 +34,24 @@ export function SimulationView({ initialIsLeader = false }: SimulationViewProps)
   useClaudeDecisions();
   useDisasterEffects();
   
+  // Secret reset: Press Ctrl+Shift+X to completely reset the simulation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'X') {
+        if (confirm('🔄 Reset the entire simulation? This will clear everything and start fresh!')) {
+          console.log('🧹 Resetting simulation...');
+          // Clear all localStorage
+          localStorage.clear();
+          // Reload to trigger fresh start
+          window.location.reload();
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+  
   useEffect(() => {
     const handleBuildLocation = (e: Event) => {
       const customEvent = e as CustomEvent<{ x: number; y: number }>;
