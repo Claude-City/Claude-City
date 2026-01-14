@@ -60,7 +60,7 @@ type GameContextValue = {
   // Canvas should use this instead of state.grid for smooth updates
   latestStateRef: React.RefObject<GameState>;
   setTool: (tool: Tool) => void;
-  setSpeed: (speed: 0 | 1 | 2 | 3) => void;
+  setSpeed: (speed: 0 | 1 | 2 | 3 | 4 | 5) => void;
   setTaxRate: (rate: number) => void;
   setActivePanel: (panel: GameState['activePanel']) => void;
   setBudgetFunding: (key: keyof Budget, funding: number) => void;
@@ -874,7 +874,7 @@ export function GameProvider({
     setState((prev) => ({ ...prev, selectedTool: tool, activePanel: 'none' }));
   }, []);
 
-  const setSpeed = useCallback((speed: 0 | 1 | 2 | 3) => {
+  const setSpeed = useCallback((speed: 0 | 1 | 2 | 3 | 4 | 5) => {
     setState((prev) => ({ ...prev, speed }));
   }, []);
 
