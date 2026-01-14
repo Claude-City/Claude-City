@@ -14,6 +14,7 @@ import { loadGlobalState, saveGlobalState, checkLeadership } from '@/lib/global-
 import { GameState } from '@/types/game';
 import { generateRandomAdvancedCity, DEFAULT_GRID_SIZE } from '@/lib/simulation';
 import { Brain, Loader2, Wifi, WifiOff } from 'lucide-react';
+import '@/styles/theme.css';
 
 type LoadingStatus = 
   | 'connecting'
@@ -129,35 +130,87 @@ export function GlobalSimulationLoader() {
     const isError = status === 'error';
 
     return (
-      <div className="w-full h-screen bg-slate-950 flex flex-col items-center justify-center">
-        <div className="flex flex-col items-center gap-6">
+      <div 
+        className="w-full h-screen flex flex-col items-center justify-center relative overflow-hidden"
+        style={{ background: 'var(--bg-0)' }}>
+        
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-[0.03]">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="loading-grid" width="60" height="60" patternUnits="userSpaceOnUse">
+                <path d="M 60 0 L 0 0 0 60" fill="none" stroke="var(--gold-0)" strokeWidth="0.5" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#loading-grid)" />
+          </svg>
+        </div>
+        
+        {/* Horizon glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(231,210,178,0.05)_0%,transparent_60%)]" />
+        
+        <div className="flex flex-col items-center gap-8 relative z-10">
           <div className="relative">
-            <Brain className="w-20 h-20 text-cyan-400" />
+            <div 
+              className="w-24 h-24 rounded-2xl flex items-center justify-center"
+              style={{ 
+                background: 'linear-gradient(135deg, var(--bg-2) 0%, var(--bg-1) 100%)',
+                border: '1px solid var(--panel-border)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 60px rgba(231,210,178,0.1)'
+              }}>
+              <Brain className="w-12 h-12" style={{ color: 'var(--teal-0)' }} />
+            </div>
             {!isError ? (
-              <Loader2 className="w-10 h-10 text-cyan-300 animate-spin absolute -bottom-2 -right-2" />
+              <div 
+                className="absolute -bottom-3 -right-3 w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ 
+                  background: 'var(--bg-1)',
+                  border: '1px solid var(--panel-border)'
+                }}>
+                <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--gold-0)' }} />
+              </div>
             ) : (
-              <WifiOff className="w-10 h-10 text-red-400 absolute -bottom-2 -right-2" />
+              <div 
+                className="absolute -bottom-3 -right-3 w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ 
+                  background: 'rgba(248, 113, 113, 0.1)',
+                  border: '1px solid rgba(248, 113, 113, 0.3)'
+                }}>
+                <WifiOff className="w-5 h-5" style={{ color: 'var(--stat-happiness)' }} />
+              </div>
             )}
           </div>
           
           <div className="text-center">
-            <h1 className="text-3xl font-light text-white mb-3">Claude City</h1>
-            <p className={`text-lg ${isError ? 'text-red-400' : 'text-slate-400'}`}>
+            <h1 
+              className="text-3xl font-light tracking-wide mb-3"
+              style={{ color: 'var(--text-0)' }}>
+              Claude City
+            </h1>
+            <p 
+              className="text-base"
+              style={{ color: isError ? 'var(--stat-happiness)' : 'var(--text-1)' }}>
               {statusMessages[status]}
             </p>
             
             {!isError && (
-              <div className="mt-4 flex items-center justify-center gap-2 text-slate-500">
+              <div 
+                className="mt-5 flex items-center justify-center gap-2"
+                style={{ color: 'var(--gold-1)' }}>
                 <Wifi className="w-4 h-4 animate-pulse" />
-                <span className="text-sm">Syncing with global simulation</span>
+                <span className="text-sm tracking-wide">Syncing with global simulation</span>
               </div>
             )}
             
             {isError && (
               <button
                 onClick={() => window.location.reload()}
-                className="mt-6 px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-colors"
-              >
+                className="mt-6 px-6 py-2.5 rounded-xl font-medium transition-all duration-300"
+                style={{ 
+                  background: 'linear-gradient(180deg, rgba(127, 231, 225, 0.15) 0%, rgba(127, 231, 225, 0.08) 100%)',
+                  border: '1px solid rgba(127, 231, 225, 0.3)',
+                  color: 'var(--teal-0)'
+                }}>
                 Retry Connection
               </button>
             )}
@@ -165,10 +218,15 @@ export function GlobalSimulationLoader() {
           
           {/* Progress bar */}
           {!isError && (
-            <div className="w-64 h-1 bg-slate-800 rounded-full overflow-hidden mt-4">
+            <div 
+              className="w-72 h-1 rounded-full overflow-hidden"
+              style={{ background: 'var(--bg-2)' }}>
               <div 
-                className="h-full bg-cyan-500 transition-all duration-500"
-                style={{ width: `${Math.min((retryCount / 30) * 100 + 10, 95)}%` }}
+                className="h-full transition-all duration-500"
+                style={{ 
+                  width: `${Math.min((retryCount / 30) * 100 + 10, 95)}%`,
+                  background: 'linear-gradient(90deg, var(--gold-2) 0%, var(--gold-0) 100%)'
+                }}
               />
             </div>
           )}

@@ -1,43 +1,43 @@
 'use client';
 
 /**
- * Simulation Stats Panel
- * Shows city statistics in a compact format
+ * Simulation Stats Panel - Premium Edition
+ * Gold linework theme with elegant stat display
  */
 
 import React from 'react';
 import { useGame } from '@/context/GameContext';
+import { Panel, PanelDivider } from '@/components/ui/premium';
 import { 
   Users, Heart, GraduationCap, Factory, Home, TreePine, 
-  Zap, Droplets, Shield, Flame, TrendingUp, TrendingDown
+  Zap, Droplets, Shield, Flame, TrendingUp, TrendingDown, BarChart3
 } from 'lucide-react';
 
-function StatRow({ 
-  icon: Icon, 
-  label, 
-  value, 
-  color = 'text-slate-300',
-  subValue,
-  trend
-}: { 
-  icon: React.ElementType; 
-  label: string; 
+interface StatRowProps {
+  icon: React.ElementType;
+  label: string;
   value: string | number;
   color?: string;
   subValue?: string;
   trend?: 'up' | 'down' | 'neutral';
-}) {
+}
+
+function StatRow({ icon: Icon, label, value, color, subValue, trend }: StatRowProps) {
   return (
     <div className="flex items-center justify-between py-1.5">
       <div className="flex items-center gap-2">
-        <Icon className={`w-3.5 h-3.5 ${color}`} />
-        <span className="text-slate-400 text-xs">{label}</span>
+        <Icon className="w-3.5 h-3.5" style={{ color: color || 'var(--text-2)' }} />
+        <span className="text-xs" style={{ color: 'var(--text-2)' }}>{label}</span>
       </div>
-      <div className="flex items-center gap-1">
-        <span className={`text-sm font-medium ${color}`}>{value}</span>
-        {subValue && <span className="text-[10px] text-slate-500">{subValue}</span>}
-        {trend === 'up' && <TrendingUp className="w-3 h-3 text-green-400" />}
-        {trend === 'down' && <TrendingDown className="w-3 h-3 text-red-400" />}
+      <div className="flex items-center gap-1.5">
+        <span className="text-sm font-semibold" style={{ color: color || 'var(--text-0)' }}>
+          {value}
+        </span>
+        {subValue && (
+          <span className="text-[10px]" style={{ color: 'var(--text-2)' }}>{subValue}</span>
+        )}
+        {trend === 'up' && <TrendingUp className="w-3 h-3" style={{ color: 'var(--stat-money)' }} />}
+        {trend === 'down' && <TrendingDown className="w-3 h-3" style={{ color: 'var(--stat-happiness)' }} />}
       </div>
     </div>
   );
@@ -46,7 +46,6 @@ function StatRow({
 export function SimulationStats() {
   const { state } = useGame();
   
-  // Count buildings
   const countBuildings = (types: string[]) => {
     let count = 0;
     for (const row of state.grid) {
@@ -63,34 +62,24 @@ export function SimulationStats() {
     'apartment_small', 'apartment_medium', 'apartment_large'
   ]);
   
-  const commercialCount = countBuildings([
-    'shop_small', 'shop_medium', 'shop_large',
-    'commercial_small', 'commercial_medium', 'commercial_large',
-    'office_small', 'office_medium', 'office_large'
-  ]);
-  
   const industrialCount = countBuildings([
     'factory_small', 'factory_medium', 'factory_large',
     'industrial_small', 'industrial_medium', 'industrial_large'
   ]);
   
-  const roads = countBuildings(['road', 'bridge']);
   const parks = countBuildings(['park', 'park_large', 'tennis', 'playground_small', 'playground_large']);
   const powerPlants = countBuildings(['power_plant']);
   const waterTowers = countBuildings(['water_tower']);
-  const hospitals = countBuildings(['hospital']);
   const schools = countBuildings(['school', 'university']);
   const police = countBuildings(['police_station']);
   const fire = countBuildings(['fire_station']);
   
-  // Determine happiness color
   const happinessColor = state.stats.happiness > 70 
-    ? 'text-green-400' 
+    ? 'var(--stat-money)' 
     : state.stats.happiness > 40 
-    ? 'text-yellow-400' 
-    : 'text-red-400';
+    ? 'var(--stat-warning)' 
+    : 'var(--stat-happiness)';
   
-  // Determine money trend
   const moneyTrend = state.stats.income > state.stats.expenses 
     ? 'up' 
     : state.stats.income < state.stats.expenses 
@@ -98,59 +87,104 @@ export function SimulationStats() {
     : 'neutral';
   
   return (
-    <div className="p-4 border-b border-slate-800">
-      <h3 className="text-sm font-medium text-white mb-3">City Statistics</h3>
-      
-      {/* Key Metrics */}
-      <div className="space-y-0.5 mb-4">
-        <StatRow 
-          icon={Users} 
-          label="Population" 
-          value={state.stats.population.toLocaleString()}
-          color="text-white"
-        />
-        <StatRow 
-          icon={Heart} 
-          label="Happiness" 
-          value={`${Math.round(state.stats.happiness)}%`}
-          color={happinessColor}
-        />
-        <StatRow 
-          icon={Factory} 
-          label="Jobs" 
-          value={state.stats.jobs.toLocaleString()}
-          subValue={state.stats.population > 0 
-            ? `${Math.round((state.stats.jobs / state.stats.population) * 100)}%` 
-            : '0%'}
-        />
-      </div>
-      
-      {/* Finances */}
-      <div className="bg-slate-800/30 rounded-lg p-2 mb-4">
-        <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Treasury</div>
-        <div className="text-lg font-medium text-emerald-400">${state.stats.money.toLocaleString()}</div>
-        <div className="flex items-center gap-2 text-[10px] mt-1">
-          <span className="text-green-400">+${state.stats.income}</span>
-          <span className="text-slate-600">/</span>
-          <span className="text-red-400">-${state.stats.expenses}</span>
-          <span className={`ml-auto ${moneyTrend === 'up' ? 'text-green-400' : moneyTrend === 'down' ? 'text-red-400' : 'text-slate-400'}`}>
-            {moneyTrend === 'up' ? '↑' : moneyTrend === 'down' ? '↓' : '→'} 
-            ${Math.abs(state.stats.income - state.stats.expenses)}
+    <div className="p-3 space-y-3">
+      {/* Header */}
+      <Panel className="!p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <BarChart3 className="w-4 h-4" style={{ color: 'var(--gold-0)' }} />
+          <span 
+            className="text-xs font-semibold uppercase tracking-wider"
+            style={{ color: 'var(--gold-0)' }}>
+            City Statistics
           </span>
         </div>
-      </div>
+        
+        {/* Key Metrics */}
+        <div className="space-y-1">
+          <StatRow 
+            icon={Users} 
+            label="Population" 
+            value={state.stats.population.toLocaleString()}
+            color="var(--stat-population)"
+          />
+          <StatRow 
+            icon={Heart} 
+            label="Happiness" 
+            value={`${Math.round(state.stats.happiness)}%`}
+            color={happinessColor}
+          />
+          <StatRow 
+            icon={Factory} 
+            label="Employment" 
+            value={state.stats.jobs.toLocaleString()}
+            subValue={state.stats.population > 0 
+              ? `${Math.round((state.stats.jobs / state.stats.population) * 100)}%` 
+              : '0%'}
+            color="var(--text-0)"
+          />
+        </div>
+      </Panel>
       
-      {/* Infrastructure Grid */}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs">
-        <StatRow icon={Home} label="Housing" value={residentialCount} />
-        <StatRow icon={Factory} label="Industry" value={industrialCount} />
-        <StatRow icon={TreePine} label="Parks" value={parks} color="text-green-400" />
-        <StatRow icon={Zap} label="Power" value={powerPlants} color="text-yellow-400" />
-        <StatRow icon={Droplets} label="Water" value={waterTowers} color="text-blue-400" />
-        <StatRow icon={Shield} label="Police" value={police} color="text-blue-300" />
-        <StatRow icon={Flame} label="Fire" value={fire} color="text-orange-400" />
-        <StatRow icon={GraduationCap} label="Schools" value={schools} color="text-purple-400" />
-      </div>
+      {/* Treasury */}
+      <Panel className="!p-4">
+        <div className="text-[10px] uppercase tracking-widest mb-1.5" style={{ color: 'var(--text-2)' }}>
+          Treasury
+        </div>
+        <div 
+          className="text-2xl font-semibold stat-glow-money"
+          style={{ color: 'var(--stat-money)' }}>
+          ${state.stats.money.toLocaleString()}
+        </div>
+        
+        <PanelDivider className="!my-3" />
+        
+        <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center gap-3">
+            <span style={{ color: 'var(--stat-money)' }}>
+              +${state.stats.income.toLocaleString()}
+            </span>
+            <span style={{ color: 'var(--gold-2)' }}>/</span>
+            <span style={{ color: 'var(--stat-happiness)' }}>
+              -${state.stats.expenses.toLocaleString()}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            {moneyTrend === 'up' ? (
+              <TrendingUp className="w-3.5 h-3.5" style={{ color: 'var(--stat-money)' }} />
+            ) : moneyTrend === 'down' ? (
+              <TrendingDown className="w-3.5 h-3.5" style={{ color: 'var(--stat-happiness)' }} />
+            ) : (
+              <span style={{ color: 'var(--text-2)' }}>→</span>
+            )}
+            <span style={{ 
+              color: moneyTrend === 'up' 
+                ? 'var(--stat-money)' 
+                : moneyTrend === 'down' 
+                ? 'var(--stat-happiness)' 
+                : 'var(--text-2)'
+            }}>
+              ${Math.abs(state.stats.income - state.stats.expenses).toLocaleString()}
+            </span>
+          </div>
+        </div>
+      </Panel>
+      
+      {/* Infrastructure */}
+      <Panel className="!p-4">
+        <div className="text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--text-2)' }}>
+          Infrastructure
+        </div>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+          <StatRow icon={Home} label="Housing" value={residentialCount} color="var(--text-0)" />
+          <StatRow icon={Factory} label="Industry" value={industrialCount} color="var(--text-0)" />
+          <StatRow icon={TreePine} label="Parks" value={parks} color="var(--stat-money)" />
+          <StatRow icon={Zap} label="Power" value={powerPlants} color="var(--stat-warning)" />
+          <StatRow icon={Droplets} label="Water" value={waterTowers} color="var(--stat-population)" />
+          <StatRow icon={Shield} label="Police" value={police} color="var(--stat-info)" />
+          <StatRow icon={Flame} label="Fire" value={fire} color="#FB923C" />
+          <StatRow icon={GraduationCap} label="Schools" value={schools} color="var(--teal-0)" />
+        </div>
+      </Panel>
     </div>
   );
 }

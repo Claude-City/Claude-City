@@ -1,0 +1,176 @@
+/**
+ * Claude City Premium Theme
+ * Gold linework on black - elegant simulation console
+ */
+
+:root {
+  /* Base backgrounds */
+  --bg-0: #050607;
+  --bg-1: #070A0F;
+  --bg-2: #0B101A;
+  --bg-3: #0F1520;
+  
+  /* Text colors */
+  --text-0: #E9ECEF;
+  --text-1: #AEB6C2;
+  --text-2: #6B7280;
+  
+  /* Signature gold linework */
+  --gold-0: #E7D2B2;
+  --gold-1: #BFA07A;
+  --gold-2: #7D5E3F;
+  --gold-3: #5A4530;
+  
+  /* Teal micro-accent */
+  --teal-0: #7FE7E1;
+  --teal-1: #1FBDB4;
+  --teal-2: #0D8A84;
+  
+  /* Stat colors (slightly desaturated for premium feel) */
+  --stat-money: #4ADE80;
+  --stat-money-glow: rgba(74, 222, 128, 0.15);
+  --stat-happiness: #F87171;
+  --stat-happiness-glow: rgba(248, 113, 113, 0.15);
+  --stat-population: #60A5FA;
+  --stat-population-glow: rgba(96, 165, 250, 0.15);
+  --stat-warning: #FBBF24;
+  --stat-info: #38BDF8;
+  --stat-neutral: #94A3B8;
+  
+  /* Panel styling */
+  --panel-border: rgba(191, 160, 122, 0.15);
+  --panel-border-hover: rgba(191, 160, 122, 0.25);
+  --panel-glow: rgba(231, 210, 178, 0.05);
+  --panel-inset: rgba(231, 210, 178, 0.06);
+  
+  /* Linework pattern */
+  --linework-opacity: 0.04;
+  --linework-color: var(--gold-0);
+}
+
+/* Linework pattern background */
+.linework-pattern {
+  background-image: 
+    linear-gradient(var(--gold-1) 1px, transparent 1px),
+    linear-gradient(90deg, var(--gold-1) 1px, transparent 1px),
+    linear-gradient(var(--gold-2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--gold-2) 1px, transparent 1px);
+  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+  background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
+  opacity: var(--linework-opacity);
+  pointer-events: none;
+}
+
+/* Animated linework */
+@keyframes linework-drift {
+  0% {
+    background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px;
+  }
+  100% {
+    background-position: 100px 50px, 100px 50px, 20px 10px, 20px 10px;
+  }
+}
+
+.linework-animated {
+  animation: linework-drift 60s linear infinite;
+}
+
+/* Circuit/maze pattern */
+.circuit-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0v15M30 45v15M0 30h15M45 30h15M30 30h15v15M15 15h15v15' stroke='%23BFA07A' stroke-width='0.5' fill='none' opacity='0.15'/%3E%3C/svg%3E");
+  background-size: 60px 60px;
+}
+
+/* Horizon line effect */
+.horizon-line {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 49%,
+    rgba(231, 210, 178, 0.08) 50%,
+    transparent 51%,
+    transparent 100%
+  );
+}
+
+/* Gold glow effect */
+.gold-glow {
+  box-shadow: 
+    0 0 20px rgba(231, 210, 178, 0.1),
+    inset 0 1px 0 rgba(231, 210, 178, 0.1);
+}
+
+/* Panel base styles */
+.panel-base {
+  background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  box-shadow: 
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 var(--panel-inset);
+}
+
+.panel-base:hover {
+  border-color: var(--panel-border-hover);
+}
+
+/* Stat number glow */
+.stat-glow-money {
+  text-shadow: 0 0 12px var(--stat-money-glow);
+}
+
+.stat-glow-happiness {
+  text-shadow: 0 0 12px var(--stat-happiness-glow);
+}
+
+.stat-glow-population {
+  text-shadow: 0 0 12px var(--stat-population-glow);
+}
+
+/* Gold button styles */
+.btn-gold {
+  background: transparent;
+  border: 1px solid rgba(191, 160, 122, 0.3);
+  color: var(--text-0);
+  transition: all 0.2s ease;
+}
+
+.btn-gold:hover {
+  border-color: rgba(191, 160, 122, 0.6);
+  background: rgba(191, 160, 122, 0.08);
+  box-shadow: 0 0 16px rgba(231, 210, 178, 0.1);
+}
+
+.btn-gold-primary {
+  background: linear-gradient(180deg, rgba(191, 160, 122, 0.15) 0%, rgba(191, 160, 122, 0.08) 100%);
+  border: 1px solid rgba(191, 160, 122, 0.4);
+  color: var(--gold-0);
+}
+
+/* Divider styles */
+.divider-gold {
+  border-color: rgba(191, 160, 122, 0.1);
+}
+
+.divider-gold-dotted {
+  border-style: dotted;
+  border-color: rgba(191, 160, 122, 0.15);
+}
+
+/* Scrollbar styling */
+.gold-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.gold-scrollbar::-webkit-scrollbar-track {
+  background: var(--bg-1);
+}
+
+.gold-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--gold-2);
+  border-radius: 3px;
+}
+
+.gold-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-1);
+}
