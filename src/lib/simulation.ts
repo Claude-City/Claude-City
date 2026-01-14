@@ -1123,7 +1123,7 @@ function generateUUID(): string {
   });
 }
 
-export function createInitialGameState(size: number = DEFAULT_GRID_SIZE, cityName: string = 'New City'): GameState {
+export function createInitialGameState(size: number = DEFAULT_GRID_SIZE, cityName: string = 'Claude City'): GameState {
   const { grid, waterBodies } = generateTerrain(size);
   const adjacentCities = generateAdjacentCities();
   
@@ -3135,7 +3135,7 @@ export function placeLandTerraform(state: GameState, x: number, y: number): Game
 }
 
 // Generate a random advanced city state with developed zones, infrastructure, and buildings
-export function generateRandomAdvancedCity(size: number = DEFAULT_GRID_SIZE, cityName: string = 'Metropolis'): GameState {
+export function generateRandomAdvancedCity(size: number = DEFAULT_GRID_SIZE, cityName: string = 'Claude City'): GameState {
   // Start with a base state (terrain generation)
   const baseState = createInitialGameState(size, cityName);
   const grid = baseState.grid;
