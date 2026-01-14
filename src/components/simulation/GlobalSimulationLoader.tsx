@@ -117,12 +117,12 @@ export function GlobalSimulationLoader() {
   // Loading screen with status
   if (status !== 'ready') {
     const statusMessages: Record<LoadingStatus, string> = {
-      connecting: 'Connecting to server...',
-      loading: 'Loading global simulation...',
-      creating: 'Creating new simulation...',
-      saving: 'Saving to cloud...',
-      waiting: 'Waiting for simulation host...',
-      retrying: `Retrying... (${retryCount}/30)`,
+      connecting: 'Connecting...',
+      loading: 'Loading simulation...',
+      creating: 'Creating city...',
+      saving: 'Saving...',
+      waiting: 'Waiting for host...',
+      retrying: `Retry ${retryCount}/30`,
       ready: 'Ready!',
       error: errorMessage || 'Connection failed',
     };
@@ -130,103 +130,51 @@ export function GlobalSimulationLoader() {
     const isError = status === 'error';
 
     return (
-      <div 
-        className="w-full h-screen flex flex-col items-center justify-center relative overflow-hidden"
-        style={{ background: 'var(--bg-0)' }}>
-        
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-[0.03]">
-          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="loading-grid" width="60" height="60" patternUnits="userSpaceOnUse">
-                <path d="M 60 0 L 0 0 0 60" fill="none" stroke="var(--gold-0)" strokeWidth="0.5" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#loading-grid)" />
-          </svg>
-        </div>
-        
-        {/* Horizon glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(231,210,178,0.05)_0%,transparent_60%)]" />
-        
-        <div className="flex flex-col items-center gap-8 relative z-10">
+      <div className="w-full h-screen flex flex-col items-center justify-center bg-[#0a0a0c]">
+        <div className="flex flex-col items-center gap-6">
           <div className="relative">
-            <div 
-              className="w-24 h-24 rounded-2xl flex items-center justify-center"
-              style={{ 
-                background: 'linear-gradient(135deg, var(--bg-2) 0%, var(--bg-1) 100%)',
-                border: '1px solid var(--panel-border)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 60px rgba(231,210,178,0.1)'
-              }}>
-              <Brain className="w-12 h-12" style={{ color: 'var(--teal-0)' }} />
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-white/[0.03] border border-white/5">
+              <Brain className={`w-10 h-10 text-[#5eead4] ${!isError ? 'animate-pulse' : ''}`} />
             </div>
             {!isError ? (
-              <div 
-                className="absolute -bottom-3 -right-3 w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ 
-                  background: 'var(--bg-1)',
-                  border: '1px solid var(--panel-border)'
-                }}>
-                <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--gold-0)' }} />
+              <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-lg flex items-center justify-center bg-[#14161b] border border-white/10">
+                <Loader2 className="w-4 h-4 animate-spin text-white/50" />
               </div>
             ) : (
-              <div 
-                className="absolute -bottom-3 -right-3 w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ 
-                  background: 'rgba(248, 113, 113, 0.1)',
-                  border: '1px solid rgba(248, 113, 113, 0.3)'
-                }}>
-                <WifiOff className="w-5 h-5" style={{ color: 'var(--stat-happiness)' }} />
+              <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-lg flex items-center justify-center bg-[#f87171]/10 border border-[#f87171]/20">
+                <WifiOff className="w-4 h-4 text-[#f87171]" />
               </div>
             )}
           </div>
           
           <div className="text-center">
-            <h1 
-              className="text-3xl font-light tracking-wide mb-3"
-              style={{ color: 'var(--text-0)' }}>
-              Claude City
-            </h1>
-            <p 
-              className="text-base"
-              style={{ color: isError ? 'var(--stat-happiness)' : 'var(--text-1)' }}>
+            <h1 className="text-xl font-medium text-white/90 mb-2">Claude City</h1>
+            <p className={`text-sm ${isError ? 'text-[#f87171]' : 'text-white/40'}`}>
               {statusMessages[status]}
             </p>
             
             {!isError && (
-              <div 
-                className="mt-5 flex items-center justify-center gap-2"
-                style={{ color: 'var(--gold-1)' }}>
-                <Wifi className="w-4 h-4 animate-pulse" />
-                <span className="text-sm tracking-wide">Syncing with global simulation</span>
+              <div className="mt-4 flex items-center justify-center gap-2 text-white/30 text-xs">
+                <Wifi className="w-3 h-3 animate-pulse" />
+                <span>Syncing</span>
               </div>
             )}
             
             {isError && (
               <button
                 onClick={() => window.location.reload()}
-                className="mt-6 px-6 py-2.5 rounded-xl font-medium transition-all duration-300"
-                style={{ 
-                  background: 'linear-gradient(180deg, rgba(127, 231, 225, 0.15) 0%, rgba(127, 231, 225, 0.08) 100%)',
-                  border: '1px solid rgba(127, 231, 225, 0.3)',
-                  color: 'var(--teal-0)'
-                }}>
-                Retry Connection
+                className="mt-4 px-4 py-2 rounded-lg text-sm bg-white/5 text-white/70 hover:bg-white/10 transition-colors"
+              >
+                Retry
               </button>
             )}
           </div>
           
-          {/* Progress bar */}
           {!isError && (
-            <div 
-              className="w-72 h-1 rounded-full overflow-hidden"
-              style={{ background: 'var(--bg-2)' }}>
+            <div className="w-48 h-1 bg-white/5 rounded-full overflow-hidden">
               <div 
-                className="h-full transition-all duration-500"
-                style={{ 
-                  width: `${Math.min((retryCount / 30) * 100 + 10, 95)}%`,
-                  background: 'linear-gradient(90deg, var(--gold-2) 0%, var(--gold-0) 100%)'
-                }}
+                className="h-full bg-[#5eead4]/50 transition-all duration-500 rounded-full"
+                style={{ width: `${Math.min((retryCount / 30) * 100 + 10, 95)}%` }}
               />
             </div>
           )}

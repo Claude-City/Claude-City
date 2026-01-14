@@ -1,278 +1,165 @@
 'use client';
 
 /**
- * Claude Mind Panel - Premium Edition
- * Gold linework theme with elegant typography
+ * Claude Mind Panel - Clean minimal style
  */
 
 import React from 'react';
 import { useGovernor } from '@/context/GovernorContext';
-import { Panel, PanelHeader, PanelDivider } from '@/components/ui/premium';
 import { Brain, Target, Eye, AlertTriangle, Zap, Activity } from 'lucide-react';
 
-const STYLE_DESCRIPTIONS: Record<string, { text: string; color: string }> = {
-  authoritarian: { text: 'Active Interventionist', color: 'var(--stat-happiness)' },
-  libertarian: { text: 'Minimal Intervention', color: 'var(--stat-money)' },
-  balanced: { text: 'Balanced Approach', color: 'var(--stat-population)' },
-  reactive: { text: 'Reactive Governance', color: 'var(--stat-warning)' },
-  emerging: { text: 'Developing Style', color: 'var(--teal-0)' },
+const STYLE_INFO: Record<string, { text: string; color: string }> = {
+  authoritarian: { text: 'Active', color: '#f87171' },
+  libertarian: { text: 'Minimal', color: '#4ade80' },
+  balanced: { text: 'Balanced', color: '#60a5fa' },
+  reactive: { text: 'Reactive', color: '#fbbf24' },
+  emerging: { text: 'Learning', color: '#5eead4' },
 };
 
 export function ClaudeMindPanelSimulation() {
   const { governorState } = useGovernor();
-  
-  const styleInfo = STYLE_DESCRIPTIONS[governorState.governanceStyle] || STYLE_DESCRIPTIONS.emerging;
+  const style = STYLE_INFO[governorState.governanceStyle] || STYLE_INFO.emerging;
   
   const totalActions = governorState.interventionCount + governorState.restraintCount;
-  const interventionRatio = totalActions > 0 
-    ? Math.round((governorState.interventionCount / totalActions) * 100) 
-    : 50;
+  const ratio = totalActions > 0 ? Math.round((governorState.interventionCount / totalActions) * 100) : 50;
   
   return (
-    <div className="h-full flex flex-col p-3 gap-3">
-      {/* Header Card */}
-      <Panel className="!p-4">
-        <div className="flex items-center gap-3 mb-3">
-          <div 
-            className="w-10 h-10 rounded-xl flex items-center justify-center"
-            style={{ 
-              background: 'linear-gradient(135deg, rgba(127, 231, 225, 0.15) 0%, rgba(127, 231, 225, 0.05) 100%)',
-              border: '1px solid rgba(127, 231, 225, 0.2)'
-            }}>
-            <Brain 
-              className={`w-5 h-5 ${governorState.isThinking ? 'animate-pulse' : ''}`}
-              style={{ color: 'var(--teal-0)' }} 
-            />
+    <div className="p-3 space-y-3">
+      {/* Header */}
+      <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
+        <div className="flex items-center gap-2.5 mb-2">
+          <div className={`p-1.5 rounded-lg bg-[#5eead4]/10 ${governorState.isThinking ? 'animate-pulse' : ''}`}>
+            <Brain className="w-4 h-4 text-[#5eead4]" />
           </div>
           <div>
-            <h2 className="font-semibold text-sm" style={{ color: 'var(--text-0)' }}>
-              Claude&apos;s Mind
-            </h2>
-            <p className="text-xs" style={{ color: styleInfo.color }}>
-              {styleInfo.text}
-            </p>
+            <div className="text-sm font-medium text-white/90">Claude&apos;s Mind</div>
+            <div className="text-[10px]" style={{ color: style.color }}>{style.text}</div>
           </div>
         </div>
-        
-        <div className="flex items-center justify-between">
-          <span className="text-xs" style={{ color: 'var(--text-2)' }}>
-            Total Decisions
-          </span>
-          <span className="text-sm font-semibold" style={{ color: 'var(--gold-0)' }}>
-            {governorState.totalDecisions}
-          </span>
+        <div className="flex items-center justify-between text-[10px] text-white/40">
+          <span>Decisions</span>
+          <span className="text-white/70">{governorState.totalDecisions}</span>
         </div>
-      </Panel>
+      </div>
       
-      {/* Current Goals */}
-      <Panel className="!p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Target className="w-4 h-4" style={{ color: 'var(--stat-money)' }} />
-          <span 
-            className="text-xs font-semibold uppercase tracking-wider"
-            style={{ color: 'var(--stat-money)' }}>
-            Current Goal
-          </span>
+      {/* Goals */}
+      <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
+        <div className="flex items-center gap-2 mb-2">
+          <Target className="w-3.5 h-3.5 text-[#4ade80]" />
+          <span className="text-[11px] font-medium text-[#4ade80]">Goal</span>
         </div>
         {governorState.currentGoals.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {governorState.currentGoals.map((goal, i) => (
-              <p 
-                key={i} 
-                className="text-sm leading-relaxed pl-2"
-                style={{ 
-                  color: 'var(--text-0)',
-                  borderLeft: '2px solid var(--stat-money)',
-                  paddingLeft: '12px'
-                }}>
+              <p key={i} className="text-xs text-white/70 leading-relaxed pl-5">
                 {goal}
               </p>
             ))}
           </div>
         ) : (
-          <p className="text-sm italic pl-2" style={{ color: 'var(--text-2)' }}>
-            Formulating strategy...
-          </p>
+          <p className="text-xs text-white/30 italic pl-5">Planning...</p>
         )}
-      </Panel>
+      </div>
       
       {/* Observations */}
-      <Panel className="!p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Eye className="w-4 h-4" style={{ color: 'var(--stat-population)' }} />
-          <span 
-            className="text-xs font-semibold uppercase tracking-wider"
-            style={{ color: 'var(--stat-population)' }}>
-            Observations
-          </span>
+      <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
+        <div className="flex items-center gap-2 mb-2">
+          <Eye className="w-3.5 h-3.5 text-[#60a5fa]" />
+          <span className="text-[11px] font-medium text-[#60a5fa]">Observations</span>
         </div>
         {governorState.observations.length > 0 ? (
-          <ul className="space-y-2">
+          <ul className="space-y-1.5">
             {governorState.observations.slice(-3).map((obs, i) => (
-              <li 
-                key={i} 
-                className="text-sm leading-relaxed flex items-start gap-2"
-                style={{ color: 'var(--text-1)' }}>
-                <span style={{ color: 'var(--stat-population)', marginTop: '4px' }}>•</span>
+              <li key={i} className="text-xs text-white/60 leading-relaxed pl-5 flex gap-2">
+                <span className="text-[#60a5fa]/50">•</span>
                 <span>{obs}</span>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-sm italic" style={{ color: 'var(--text-2)' }}>
-            Analyzing city data...
-          </p>
+          <p className="text-xs text-white/30 italic pl-5">Analyzing...</p>
         )}
-      </Panel>
+      </div>
       
       {/* Concerns */}
       {governorState.concerns.length > 0 && (
-        <Panel 
-          className="!p-4"
-          style={{ 
-            background: 'linear-gradient(180deg, rgba(251, 191, 36, 0.08) 0%, rgba(251, 191, 36, 0.02) 100%)',
-            borderColor: 'rgba(251, 191, 36, 0.2)'
-          }}>
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="w-4 h-4" style={{ color: 'var(--stat-warning)' }} />
-            <span 
-              className="text-xs font-semibold uppercase tracking-wider"
-              style={{ color: 'var(--stat-warning)' }}>
-              Concerns
-            </span>
+        <div className="p-3 rounded-lg bg-[#fbbf24]/5 border border-[#fbbf24]/10">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle className="w-3.5 h-3.5 text-[#fbbf24]" />
+            <span className="text-[11px] font-medium text-[#fbbf24]">Concerns</span>
           </div>
-          <ul className="space-y-2">
-            {governorState.concerns.map((concern, i) => (
-              <li 
-                key={i} 
-                className="text-sm leading-relaxed flex items-start gap-2"
-                style={{ color: 'var(--stat-warning)' }}>
-                <span style={{ marginTop: '2px' }}>⚠</span>
-                <span style={{ color: 'var(--text-0)' }}>{concern}</span>
+          <ul className="space-y-1.5">
+            {governorState.concerns.map((c, i) => (
+              <li key={i} className="text-xs text-white/70 leading-relaxed pl-5 flex gap-2">
+                <span className="text-[#fbbf24]/60">!</span>
+                <span>{c}</span>
               </li>
             ))}
           </ul>
-        </Panel>
+        </div>
       )}
       
       {/* Last Decision */}
-      <Panel className="!p-4 flex-1">
-        <div className="flex items-center gap-2 mb-3">
-          <Zap className="w-4 h-4" style={{ color: 'var(--teal-0)' }} />
-          <span 
-            className="text-xs font-semibold uppercase tracking-wider"
-            style={{ color: 'var(--teal-0)' }}>
-            Last Decision
-          </span>
+      <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
+        <div className="flex items-center gap-2 mb-2">
+          <Zap className="w-3.5 h-3.5 text-[#5eead4]" />
+          <span className="text-[11px] font-medium text-[#5eead4]">Last Action</span>
         </div>
         {governorState.lastDecision ? (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span 
-                className="px-2.5 py-1 rounded text-xs font-bold uppercase"
-                style={{ 
-                  background: governorState.lastDecision.type === 'observe' 
-                    ? 'rgba(148, 163, 184, 0.15)'
-                    : governorState.lastDecision.type === 'build'
-                    ? 'rgba(74, 222, 128, 0.15)'
-                    : governorState.lastDecision.type === 'zone'
-                    ? 'rgba(96, 165, 250, 0.15)'
-                    : 'rgba(127, 231, 225, 0.15)',
-                  color: governorState.lastDecision.type === 'observe' 
-                    ? 'var(--stat-neutral)'
-                    : governorState.lastDecision.type === 'build'
-                    ? 'var(--stat-money)'
-                    : governorState.lastDecision.type === 'zone'
-                    ? 'var(--stat-population)'
-                    : 'var(--teal-0)',
-                  border: `1px solid ${governorState.lastDecision.type === 'observe' 
-                    ? 'rgba(148, 163, 184, 0.3)'
-                    : governorState.lastDecision.type === 'build'
-                    ? 'rgba(74, 222, 128, 0.3)'
-                    : governorState.lastDecision.type === 'zone'
-                    ? 'rgba(96, 165, 250, 0.3)'
-                    : 'rgba(127, 231, 225, 0.3)'}`
-                }}>
-                {governorState.lastDecision.type}
+          <div className="pl-5">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
+                governorState.lastDecision.type === 'build' ? 'bg-[#4ade80]/10 text-[#4ade80]' :
+                governorState.lastDecision.type === 'zone' ? 'bg-[#60a5fa]/10 text-[#60a5fa]' :
+                'bg-white/5 text-white/50'
+              }`}>
+                {governorState.lastDecision.type.toUpperCase()}
               </span>
               {governorState.lastDecision.target && (
-                <span className="text-sm" style={{ color: 'var(--text-1)' }}>
-                  {governorState.lastDecision.target}
-                </span>
+                <span className="text-xs text-white/40">{governorState.lastDecision.target}</span>
               )}
             </div>
-            <p 
-              className="text-sm leading-relaxed"
-              style={{ 
-                color: 'var(--text-1)',
-                borderLeft: '2px solid var(--gold-2)',
-                paddingLeft: '12px'
-              }}>
-              {governorState.reasoning}
-            </p>
+            <p className="text-xs text-white/50 leading-relaxed">{governorState.reasoning}</p>
           </div>
         ) : (
-          <p className="text-sm italic" style={{ color: 'var(--text-2)' }}>
-            Awaiting first decision...
-          </p>
+          <p className="text-xs text-white/30 italic pl-5">Waiting...</p>
         )}
-      </Panel>
+      </div>
       
-      {/* Governance Stats */}
-      <Panel className="!p-4">
+      {/* Stats */}
+      <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
         <div className="flex items-center gap-2 mb-3">
-          <Activity className="w-4 h-4" style={{ color: 'var(--gold-0)' }} />
-          <span 
-            className="text-xs font-semibold uppercase tracking-wider"
-            style={{ color: 'var(--gold-0)' }}>
-            Governance Style
-          </span>
+          <Activity className="w-3.5 h-3.5 text-white/40" />
+          <span className="text-[11px] font-medium text-white/40">Style</span>
         </div>
         
-        <div className="flex items-center justify-between text-xs mb-2">
-          <span style={{ color: 'var(--text-2)' }}>Intervention Tendency</span>
-          <span style={{ color: 'var(--text-0)' }}>{interventionRatio}%</span>
-        </div>
-        
-        <div 
-          className="h-2 rounded-full overflow-hidden"
-          style={{ background: 'var(--bg-2)' }}>
-          <div 
-            className="h-full transition-all duration-500"
-            style={{ 
-              width: `${interventionRatio}%`,
-              background: 'linear-gradient(90deg, var(--stat-money) 0%, var(--stat-population) 50%, var(--stat-happiness) 100%)'
-            }}
-          />
-        </div>
-        
-        <div className="flex justify-between text-[10px] mt-1.5" style={{ color: 'var(--text-2)' }}>
-          <span>Hands-off</span>
-          <span>Balanced</span>
-          <span>Active</span>
-        </div>
-        
-        <PanelDivider dotted className="!my-3" />
-        
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          <div 
-            className="rounded-lg p-2.5"
-            style={{ background: 'rgba(74, 222, 128, 0.08)', border: '1px solid rgba(74, 222, 128, 0.15)' }}>
-            <div style={{ color: 'var(--text-2)' }}>Interventions</div>
-            <div className="font-semibold" style={{ color: 'var(--stat-money)' }}>
-              {governorState.interventionCount}
-            </div>
+        <div className="mb-2">
+          <div className="flex justify-between text-[10px] text-white/40 mb-1">
+            <span>Intervention</span>
+            <span>{ratio}%</span>
           </div>
-          <div 
-            className="rounded-lg p-2.5"
-            style={{ background: 'rgba(96, 165, 250, 0.08)', border: '1px solid rgba(96, 165, 250, 0.15)' }}>
-            <div style={{ color: 'var(--text-2)' }}>Restraints</div>
-            <div className="font-semibold" style={{ color: 'var(--stat-population)' }}>
-              {governorState.restraintCount}
-            </div>
+          <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+            <div 
+              className="h-full rounded-full transition-all"
+              style={{ 
+                width: `${ratio}%`,
+                background: 'linear-gradient(90deg, #4ade80, #60a5fa, #f87171)'
+              }}
+            />
           </div>
         </div>
-      </Panel>
+        
+        <div className="grid grid-cols-2 gap-2 text-[10px]">
+          <div className="bg-white/[0.03] rounded p-2">
+            <div className="text-white/40">Active</div>
+            <div className="text-white/80 font-medium">{governorState.interventionCount}</div>
+          </div>
+          <div className="bg-white/[0.03] rounded p-2">
+            <div className="text-white/40">Passive</div>
+            <div className="text-white/80 font-medium">{governorState.restraintCount}</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
