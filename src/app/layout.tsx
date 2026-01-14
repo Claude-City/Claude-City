@@ -20,24 +20,24 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://iso-city.com'),
+  metadataBase: new URL('https://claude-city.com'),
   title: {
-    default: 'ISOCITY — Metropolis Builder',
-    template: 'ISOCITY — %s',
+    default: 'Claude City — AI Governor Simulation',
+    template: 'Claude City — %s',
   },
-  description: 'A richly detailed isometric city builder. Build your metropolis and manage resources with cars, planes, helicopters, boats, trains, citizens, and more.',
+  description: 'Watch an AI build a city from scratch. Claude City is an autonomous city-building simulation where Claude (AI) acts as the governor, making all decisions about zoning, building, taxes, and resource allocation.',
   openGraph: {
-    title: 'ISOCITY — Metropolis Builder',
-    description: 'A richly detailed isometric city builder. Build your metropolis and manage resources with cars, planes, helicopters, boats, trains, citizens, and more.',
+    title: 'Claude City — AI Governor Simulation',
+    description: 'Watch an AI build a city from scratch. Claude autonomously governs the city while you spectate.',
     type: 'website',
-    siteName: 'IsoCity',
+    siteName: 'Claude City',
     images: [
       {
         url: '/opengraph-image.png',
         width: 1179,
         height: 1406,
         type: 'image/png',
-        alt: 'ISOCITY - Isometric city builder game screenshot'
+        alt: 'Claude City - AI governed city simulation'
       }
     ],
   },
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'IsoCity'
+    title: 'Claude City'
   },
   formatDetection: {
     telephone: false
@@ -69,7 +69,7 @@ export default async function RootLayout({ children }: {children: React.ReactNod
   <html className={`dark ${playfair.variable} ${dmSans.variable}`} lang={await getLocale()}>
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
-        <link rel="apple-touch-icon" href="/assets/buildings/residential.png" />
+        <link rel="apple-touch-icon" href="/icon.png" />
         {/* Preload critical game assets - WebP for browsers that support it */}
         <link
         rel="preload"
