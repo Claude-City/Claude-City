@@ -46,7 +46,7 @@ export async function getDisasterCooldowns(): Promise<Map<DisasterType, { onCool
   });
   
   const client = getSupabaseClient();
-  if (!client) return result;
+  if (!client) return result; // No Supabase configured - all disasters available locally
   
   try {
     const { data, error } = await client
@@ -54,8 +54,13 @@ export async function getDisasterCooldowns(): Promise<Map<DisasterType, { onCool
       .select('*')
       .eq('project_id', PROJECT_ID);
     
+    // If table doesn't exist or other error, silently return defaults
+    // This allows the app to work without Supabase tables being set up
     if (error) {
-      console.error('Failed to fetch cooldowns:', error);
+      // Only log if it's not a "table doesn't exist" error
+      if (!error.message?.includes('does not exist') && error.code !== '42P01') {
+        console.warn('Disaster cooldowns not available (Supabase table may not exist)');
+      }
       return result;
     }
     
@@ -78,7 +83,7 @@ export async function getDisasterCooldowns(): Promise<Map<DisasterType, { onCool
       }
     });
   } catch (error) {
-    console.error('Error checking cooldowns:', error);
+    // Silently fail - disasters will work in local-only mode
   }
   
   return result;
@@ -119,15 +124,15 @@ export async function triggerDisaster(disasterId: DisasterType): Promise<{ succe
   if (!client) {
     // No Supabase - allow local triggering
     dispatchDisasterEvent(disasterId);
-    return { success: true, message: `${disaster.name} triggered! (Local mode)` };
+    return { success: true, message: `${disaster.name} triggered!` };
   }
   
   const userId = getAnonymousUserId();
   const now = new Date().toISOString();
   
   try {
-    // Upsert the cooldown record
-    const { error } = await client
+    // Try to upsert the cooldown record (may fail if table doesn't exist)
+    await client
       .from('claude_city_disaster_cooldowns')
       .upsert({
         disaster_id: disasterId,
@@ -138,14 +143,7 @@ export async function triggerDisaster(disasterId: DisasterType): Promise<{ succe
         onConflict: 'disaster_id,project_id',
       });
     
-    if (error) {
-      console.error('Failed to record disaster:', error);
-      // Still trigger locally
-      dispatchDisasterEvent(disasterId);
-      return { success: true, message: `${disaster.name} triggered!` };
-    }
-    
-    // Record in disaster log
+    // Try to record in disaster log
     await client
       .from('claude_city_disaster_log')
       .insert({
@@ -154,16 +152,14 @@ export async function triggerDisaster(disasterId: DisasterType): Promise<{ succe
         triggered_at: now,
         project_id: PROJECT_ID,
       });
-    
-    // Dispatch the disaster event
-    dispatchDisasterEvent(disasterId);
-    
-    return { success: true, message: `${disaster.name} unleashed upon the city!` };
-  } catch (error) {
-    console.error('Error triggering disaster:', error);
-    dispatchDisasterEvent(disasterId);
-    return { success: true, message: `${disaster.name} triggered!` };
+  } catch {
+    // Supabase tables may not exist - that's okay, continue locally
   }
+  
+  // Dispatch the disaster event (always works)
+  dispatchDisasterEvent(disasterId);
+  
+  return { success: true, message: `${disaster.name} unleashed upon the city!` };
 }
 
 // Dispatch disaster event for the game to handle

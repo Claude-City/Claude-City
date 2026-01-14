@@ -85,7 +85,7 @@ export function SimulationView() {
             <img 
               src="/logo.png" 
               alt="Claude City" 
-              className={`w-8 h-8 ${isEnabled ? 'animate-pulse' : 'opacity-50'}`}
+              className="w-8 h-8"
             />
             <h1 className="text-xl font-light tracking-wide text-white/90">
               Claude City
