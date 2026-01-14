@@ -92,22 +92,22 @@ export function useGlobalSync(initialIsLeader: boolean = true) {
         const globalState = await loadGlobalState();
         
         if (globalState && globalState.tick > 0) {
-          // Global state exists - load it and become follower
-          console.log('📡 Found existing global simulation, syncing...');
+          // Global state exists - load it and become viewer
+          console.log('📡 Found existing simulation, joining as viewer...');
           loadState(JSON.stringify(globalState));
           isLeaderRef.current = false;
           setSyncState(prev => ({ ...prev, isLeader: false, lastSync: Date.now() }));
           
-          // Check if we should take over as leader
+          // Check if we should take over as host (if previous host disconnected)
           const leaderCheck = await checkAndClaimLeadership();
           if (leaderCheck) {
-            console.log('👑 Becoming leader of the simulation');
+            console.log('🖥️ Taking over as HOST - will run Claude');
             isLeaderRef.current = true;
             setSyncState(prev => ({ ...prev, isLeader: true }));
           }
         } else {
-          // No global state - we're the first one, become leader
-          console.log('🆕 No existing simulation, starting as leader');
+          // No global state - we're the first one, become host
+          console.log('🆕 No existing simulation - becoming HOST');
           await checkAndClaimLeadership();
           isLeaderRef.current = true;
           setSyncState(prev => ({ ...prev, isLeader: true }));

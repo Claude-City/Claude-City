@@ -64,8 +64,8 @@ export function GlobalSimulationLoader() {
           const { isLeader: shouldLead } = await checkLeadership();
           
           if (shouldLead) {
-            // We're the leader - create and save new city
-            console.log('👑 Becoming leader, creating new simulation...');
+            // We're the host - create and save new city
+            console.log('🖥️ Becoming HOST - this browser will run Claude...');
             setStatus('saving');
             
             const newCity = generateRandomAdvancedCity(DEFAULT_GRID_SIZE, 'Claude City');
@@ -81,8 +81,8 @@ export function GlobalSimulationLoader() {
               console.log('❌ Failed to save, will retry...');
             }
           } else {
-            // Not leader, wait for leader to create simulation
-            console.log('⏳ Waiting for leader to create simulation...');
+            // Not host, wait for host to create simulation
+            console.log('⏳ Waiting for host to start simulation...');
             setStatus('waiting');
           }
           

@@ -49,14 +49,14 @@ export function SimulationView({ initialIsLeader = false }: SimulationViewProps)
   useEffect(() => {
     setDayNightMode('day');
     
-    console.log('🎮 Leadership status:', isLeader ? 'LEADER' : 'FOLLOWER');
+    console.log('🎮 Role:', isLeader ? 'HOST (running Claude)' : 'VIEWER (watching)');
     
     if (isLeader) {
-      console.log('👑 Starting as LEADER - speed 5, decisions enabled');
+      console.log('🖥️ This browser is hosting the simulation - Claude will make decisions here');
       setSpeed(5);
       setEnabled(true);
     } else {
-      console.log('👁️ Starting as FOLLOWER - waiting for sync');
+      console.log('👁️ Watching simulation - syncing from host');
       setSpeed(0);
       setEnabled(false);
     }
