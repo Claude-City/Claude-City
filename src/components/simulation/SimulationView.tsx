@@ -10,10 +10,12 @@ import React, { useEffect, useState } from 'react';
 import { useGame } from '@/context/GameContext';
 import { useGovernor } from '@/context/GovernorContext';
 import { useClaudeDecisions } from '@/hooks/useClaudeDecisions';
+import { useDisasterEffects } from '@/hooks/useDisasterEffects';
 import { CanvasIsometricGrid } from '@/components/game/CanvasIsometricGrid';
 import { ClaudeMindPanelSimulation } from './ClaudeMindPanelSimulation';
 import { SimulationStats } from './SimulationStats';
 import { SimulationEventFeed } from './SimulationEventFeed';
+import { DisasterPanel } from './DisasterPanel';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Brain, Clock } from 'lucide-react';
 
@@ -26,6 +28,9 @@ export function SimulationView() {
   
   // Listen for and apply Claude's decisions
   useClaudeDecisions();
+  
+  // Listen for and apply disaster effects
+  useDisasterEffects();
   
   // Listen for build locations to navigate camera
   useEffect(() => {
@@ -148,6 +153,9 @@ export function SimulationView() {
                 </div>
               </div>
             )}
+            
+            {/* Disaster Panel - Spectator chaos controls */}
+            <DisasterPanel />
           </div>
           
           {/* Right Panel - Stats & Events */}

@@ -86,6 +86,42 @@ GRANT ALL ON claude_city_sessions TO anon, authenticated;
 GRANT ALL ON claude_city_decisions TO anon, authenticated;
 
 -- ============================================
+-- DISASTER SYSTEM TABLES
+-- Global spectator-triggered disasters
+-- ============================================
+
+-- Disaster cooldowns (one row per disaster type)
+CREATE TABLE IF NOT EXISTS claude_city_disaster_cooldowns (
+  disaster_id TEXT NOT NULL,
+  last_triggered TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  triggered_by TEXT NOT NULL,
+  project_id TEXT NOT NULL DEFAULT 'claude_city',
+  PRIMARY KEY (disaster_id, project_id)
+);
+
+-- Disaster log (history of all disasters)
+CREATE TABLE IF NOT EXISTS claude_city_disaster_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  disaster_id TEXT NOT NULL,
+  triggered_by TEXT NOT NULL,
+  triggered_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  project_id TEXT NOT NULL DEFAULT 'claude_city'
+);
+
+-- Disaster indexes
+CREATE INDEX IF NOT EXISTS idx_disaster_cooldowns_project ON claude_city_disaster_cooldowns(project_id);
+CREATE INDEX IF NOT EXISTS idx_disaster_log_project ON claude_city_disaster_log(project_id);
+CREATE INDEX IF NOT EXISTS idx_disaster_log_time ON claude_city_disaster_log(triggered_at DESC);
+
+-- Disable RLS for disasters
+ALTER TABLE claude_city_disaster_cooldowns DISABLE ROW LEVEL SECURITY;
+ALTER TABLE claude_city_disaster_log DISABLE ROW LEVEL SECURITY;
+
+-- Grant access for disasters
+GRANT ALL ON claude_city_disaster_cooldowns TO anon, authenticated;
+GRANT ALL ON claude_city_disaster_log TO anon, authenticated;
+
+-- ============================================
 -- USEFUL QUERIES (for reference)
 -- ============================================
 
