@@ -3,21 +3,16 @@
 /**
  * Claude City - AI Governance Simulation
  * Auto-starting simulation where Claude governs the city
+ * Everyone watches the SAME global simulation
  */
 
 import React from 'react';
-import { GameProvider } from '@/context/GameContext';
-import { GovernorProvider } from '@/context/GovernorContext';
-import { SimulationView } from '@/components/simulation/SimulationView';
+import { GlobalSimulationLoader } from '@/components/simulation/GlobalSimulationLoader';
 
 export default function HomePage() {
-  // Simulation starts automatically - no landing page
-  // Start with a generated city so Claude has buildings and population to manage
-  return (
-    <GameProvider startFresh={true} startWithGeneratedCity={true}>
-      <GovernorProvider>
-        <SimulationView />
-      </GovernorProvider>
-    </GameProvider>
-  );
+  // GlobalSimulationLoader handles:
+  // 1. Checking for existing global simulation
+  // 2. Loading it if exists (everyone sees same state)
+  // 3. Creating new one if first visitor
+  return <GlobalSimulationLoader />;
 }

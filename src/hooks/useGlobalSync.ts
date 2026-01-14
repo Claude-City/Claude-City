@@ -24,18 +24,17 @@ interface GlobalSyncState {
   lastSync: number;
 }
 
-export function useGlobalSync() {
+export function useGlobalSync(initialIsLeader: boolean = true) {
   const { state, loadState } = useGame();
-  // Start as leader by default - ensures simulation runs immediately
-  // Will sync with others once Supabase connection is established
+  // Use the initial leader state passed from GlobalSimulationLoader
   const [syncState, setSyncState] = useState<GlobalSyncState>({
-    isLeader: true, // Default to leader so simulation starts immediately!
+    isLeader: initialIsLeader,
     viewerCount: 1,
     isSyncing: false,
     lastSync: Date.now(),
   });
   
-  const isLeaderRef = useRef(true); // Start as leader
+  const isLeaderRef = useRef(initialIsLeader);
   const lastSaveTickRef = useRef(0);
   const hasInitializedRef = useRef(false);
   const supabaseAvailable = useRef(true);

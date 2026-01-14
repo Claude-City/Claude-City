@@ -649,18 +649,24 @@ function deleteCityState(cityId: string): void {
 export function GameProvider({ 
   children, 
   startFresh = false,
-  startWithGeneratedCity = false 
+  startWithGeneratedCity = false,
+  initialState = null,
 }: { 
   children: React.ReactNode; 
   startFresh?: boolean;
   startWithGeneratedCity?: boolean;
+  initialState?: GameState | null;
 }) {
-  // Start with a default state, or generated city if specified
-  const [state, setState] = useState<GameState>(() => 
-    startWithGeneratedCity 
-      ? generateRandomAdvancedCity(DEFAULT_GRID_SIZE, 'Claude City')
-      : createInitialGameState(DEFAULT_GRID_SIZE, 'Claude City')
-  );
+  // Start with provided state, generated city, or empty
+  const [state, setState] = useState<GameState>(() => {
+    if (initialState) {
+      return initialState;
+    }
+    if (startWithGeneratedCity) {
+      return generateRandomAdvancedCity(DEFAULT_GRID_SIZE, 'Claude City');
+    }
+    return createInitialGameState(DEFAULT_GRID_SIZE, 'Claude City');
+  });
   
   const [hasExistingGame, setHasExistingGame] = useState(false);
   const [isStateReady, setIsStateReady] = useState(false);

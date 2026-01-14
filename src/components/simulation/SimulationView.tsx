@@ -22,13 +22,18 @@ import { Brain, Clock, Users, Radio } from 'lucide-react';
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export function SimulationView() {
+interface SimulationViewProps {
+  initialIsLeader?: boolean;
+}
+
+export function SimulationView({ initialIsLeader = false }: SimulationViewProps) {
   const { state, setSpeed, setDayNightMode } = useGame();
   const { isEnabled, setEnabled, forceDecision, governorState } = useGovernor();
   const [navigationTarget, setNavigationTarget] = useState<{ x: number; y: number } | null>(null);
   
   // Global sync - ensures everyone sees the same simulation
-  const { isLeader, viewerCount } = useGlobalSync();
+  // Pass initialIsLeader to start with correct state
+  const { isLeader, viewerCount } = useGlobalSync(initialIsLeader);
   
   // Listen for and apply Claude's decisions (only leader runs AI)
   useClaudeDecisions();
