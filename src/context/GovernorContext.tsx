@@ -74,22 +74,28 @@ export function GovernorProvider({ children }: { children: React.ReactNode }) {
   
   // Make a governance decision
   const makeDecision = useCallback(async () => {
+    console.log('🧠 makeDecision called, isThinking:', isThinkingRef.current, 'enabled:', isEnabled);
+    
     if (isThinkingRef.current) {
+      console.log('⏳ Already thinking, skipping...');
       return;
     }
     
     if (!config.apiKey) {
-      console.warn('⚠️ Claude API key not configured. Set NEXT_PUBLIC_CLAUDE_API_KEY environment variable.');
+      console.error('❌ Claude API key not configured!');
+      console.error('   Set NEXT_PUBLIC_CLAUDE_API_KEY environment variable on Vercel');
       // Add error event so user can see it
       addEvent({
         id: `no-api-key-${Date.now()}`,
         type: 'error',
-        message: 'Claude API key not configured. Set NEXT_PUBLIC_CLAUDE_API_KEY in environment variables.',
+        message: 'Claude API key not configured. Set NEXT_PUBLIC_CLAUDE_API_KEY in Vercel environment.',
         timestamp: Date.now(),
         tick: latestStateRef.current.tick,
       });
       return;
     }
+    
+    console.log('🤖 Starting Claude decision...');
     
     isThinkingRef.current = true;
     setGovernorState(prev => ({ ...prev, isThinking: true }));
@@ -106,6 +112,8 @@ export function GovernorProvider({ children }: { children: React.ReactNode }) {
       );
       
       if (response) {
+        console.log('✅ Claude decision received:', response.decision.type);
+        
         // Update governor state
         const newGovernorState = updateGovernorState(
           governorStateRef.current,
@@ -120,8 +128,7 @@ export function GovernorProvider({ children }: { children: React.ReactNode }) {
         
         // Apply the decision to the game (except observe)
         if (response.decision.type !== 'observe') {
-          // We need to apply this through the game context
-          // For now, we'll dispatch a custom event that the game can listen to
+          console.log('📤 Dispatching decision event:', response.decision);
           const decisionEvent = new CustomEvent('claude-decision', {
             detail: {
               decision: response.decision,
@@ -133,6 +140,7 @@ export function GovernorProvider({ children }: { children: React.ReactNode }) {
         
         lastDecisionTickRef.current = currentGameState.tick;
       } else {
+        console.error('❌ No response from Claude!');
         // Add error event
         addEvent({
           id: `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -165,8 +173,12 @@ export function GovernorProvider({ children }: { children: React.ReactNode }) {
   
   // Decision loop - check if it's time to make a decision
   useEffect(() => {
-    if (!isEnabled || gameState.speed === 0) {
+    if (!isEnabled) {
+      console.log('🔇 Governor disabled, skipping tick', gameState.tick);
       return;
+    }
+    if (gameState.speed === 0) {
+      return; // Silent - speed 0 is expected for followers
     }
     
     const currentTick = gameState.tick;
@@ -174,6 +186,7 @@ export function GovernorProvider({ children }: { children: React.ReactNode }) {
     
     // Make a decision every N ticks
     if (ticksSinceLastDecision >= config.decisionInterval && !isThinkingRef.current) {
+      console.log('⏰ Decision time! Tick:', currentTick, 'Last:', lastDecisionTickRef.current);
       makeDecision();
     }
   }, [gameState.tick, gameState.speed, isEnabled, config.decisionInterval, makeDecision]);

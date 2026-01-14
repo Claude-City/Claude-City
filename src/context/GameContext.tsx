@@ -824,11 +824,25 @@ export function GameProvider({
       );
 
       // PERF: Fast tick intervals for simulation
-      // Desktop: 500ms, 200ms, 100ms for speeds 1, 2, 3 (1x, 2.5x, 5x)
-      // Mobile: 500ms, 300ms, 150ms for speeds 1, 2, 3
+      // Speed 1: 500ms (1x), Speed 2: 200ms (2.5x), Speed 3: 100ms (5x), Speed 4: 50ms (10x), Speed 5: 20ms (25x)
+      // Mobile gets slightly slower intervals for performance
+      const speedIntervals: Record<number, number> = {
+        1: 500,
+        2: 200,
+        3: 100,
+        4: 50,
+        5: 20,
+      };
+      const mobileSpeedIntervals: Record<number, number> = {
+        1: 500,
+        2: 300,
+        3: 150,
+        4: 75,
+        5: 40,
+      };
       const interval = isMobileDevice
-        ? (state.speed === 1 ? 500 : state.speed === 2 ? 300 : 150)
-        : (state.speed === 1 ? 500 : state.speed === 2 ? 200 : 100);
+        ? (mobileSpeedIntervals[state.speed] || 40)
+        : (speedIntervals[state.speed] || 20);
 
       timer = setInterval(() => {
         tickCountRef.current++;
