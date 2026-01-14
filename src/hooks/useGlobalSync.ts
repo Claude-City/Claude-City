@@ -135,13 +135,13 @@ export function useGlobalSync(initialIsLeader: boolean = true) {
   useEffect(() => {
     if (!isLeaderRef.current) return;
 
-    // Save every 2 seconds for smooth sync
+    // Save every 1 second for real-time sync (including time)
     const saveInterval = setInterval(() => {
       saveToGlobal();
-    }, 2000);
+    }, 1000);
 
-    // Also save on every 20 tick changes
-    if (state.tick - lastSaveTickRef.current >= 20) {
+    // Also save on every 10 tick changes
+    if (state.tick - lastSaveTickRef.current >= 10) {
       saveToGlobal();
     }
 
@@ -171,7 +171,7 @@ export function useGlobalSync(initialIsLeader: boolean = true) {
       }
     });
     
-    // Also poll every 3 seconds as fallback (realtime can be unreliable)
+    // Poll every 1.5 seconds for real-time sync (realtime can be unreliable)
     const pollInterval = setInterval(async () => {
       try {
         const globalState = await loadGlobalState();
@@ -182,7 +182,7 @@ export function useGlobalSync(initialIsLeader: boolean = true) {
       } catch {
         // Ignore polling errors
       }
-    }, 3000);
+    }, 1500);
 
     return () => {
       unsubscribe();

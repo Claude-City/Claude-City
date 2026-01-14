@@ -162,6 +162,7 @@ export async function saveGlobalState(state: GameState): Promise<boolean> {
         treasury: state.stats.money,
         year: state.year,
         month: state.month,
+        hour: state.hour, // Include hour for time sync
         updated_at: new Date().toISOString(),
       }, {
         onConflict: 'id,project_id',

@@ -137,6 +137,7 @@ CREATE TABLE IF NOT EXISTS claude_city_global_state (
   treasury INTEGER DEFAULT 100000,
   year INTEGER DEFAULT 2024,
   month INTEGER DEFAULT 1,
+  hour INTEGER DEFAULT 12,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (id, project_id)
 );
