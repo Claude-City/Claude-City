@@ -65,24 +65,26 @@ export function SimulationView({ initialIsLeader = false }: SimulationViewProps)
   useEffect(() => {
     if (!isLeader) return;
     
-    // Rapid-fire initial decisions to build city quickly
-    const timers = [
-      setTimeout(() => forceDecision(), 500),
-      setTimeout(() => forceDecision(), 1500),
-      setTimeout(() => forceDecision(), 2500),
-      setTimeout(() => forceDecision(), 3500),
-      setTimeout(() => forceDecision(), 4500),
-      setTimeout(() => forceDecision(), 5500),
-      setTimeout(() => forceDecision(), 6500),
-      setTimeout(() => forceDecision(), 7500),
-      setTimeout(() => forceDecision(), 8500),
-      setTimeout(() => forceDecision(), 9500),
-      setTimeout(() => forceDecision(), 11000),
-      setTimeout(() => forceDecision(), 13000),
-      setTimeout(() => forceDecision(), 15000),
-      setTimeout(() => forceDecision(), 18000),
-      setTimeout(() => forceDecision(), 22000),
-    ];
+    // ULTRA AGGRESSIVE initial decisions - build the city FAST!
+    // Claude API calls take ~2-3 seconds, so space them out accordingly
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    
+    // First 30 seconds: rapid fire every 2 seconds
+    for (let i = 0; i < 15; i++) {
+      timers.push(setTimeout(() => forceDecision(), 500 + (i * 2000)));
+    }
+    
+    // Next 30 seconds: every 3 seconds
+    for (let i = 0; i < 10; i++) {
+      timers.push(setTimeout(() => forceDecision(), 30500 + (i * 3000)));
+    }
+    
+    // Then every 5 seconds for the next minute
+    for (let i = 0; i < 12; i++) {
+      timers.push(setTimeout(() => forceDecision(), 60500 + (i * 5000)));
+    }
+    
+    console.log(`🚀 Scheduled ${timers.length} rapid decisions for city growth!`);
     
     return () => timers.forEach(t => clearTimeout(t));
   }, [isLeader, forceDecision]);

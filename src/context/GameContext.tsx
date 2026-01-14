@@ -824,25 +824,24 @@ export function GameProvider({
       );
 
       // PERF: Fast tick intervals for simulation
-      // Speed 1: 500ms (1x), Speed 2: 200ms (2.5x), Speed 3: 100ms (5x), Speed 4: 50ms (10x), Speed 5: 20ms (25x)
-      // Mobile gets slightly slower intervals for performance
+      // Speed 5 = TURBO MODE for rapid city building
       const speedIntervals: Record<number, number> = {
-        1: 500,
-        2: 200,
-        3: 100,
-        4: 50,
-        5: 20,
+        1: 500,  // 2 ticks/sec
+        2: 200,  // 5 ticks/sec
+        3: 100,  // 10 ticks/sec
+        4: 50,   // 20 ticks/sec
+        5: 16,   // 60 ticks/sec - TURBO!
       };
       const mobileSpeedIntervals: Record<number, number> = {
         1: 500,
         2: 300,
         3: 150,
         4: 75,
-        5: 40,
+        5: 33,   // 30 ticks/sec on mobile
       };
       const interval = isMobileDevice
-        ? (mobileSpeedIntervals[state.speed] || 40)
-        : (speedIntervals[state.speed] || 20);
+        ? (mobileSpeedIntervals[state.speed] || 33)
+        : (speedIntervals[state.speed] || 16);
 
       timer = setInterval(() => {
         tickCountRef.current++;

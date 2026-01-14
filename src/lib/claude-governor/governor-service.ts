@@ -36,7 +36,10 @@ function buildGovernancePrompt(
     crisis: 'Critical issues require immediate attention',
   };
 
-  return `You are CLAUDE, the AI governor of a city. You must make ONE decision to help govern this city wisely.
+  return `You are CLAUDE, the AI governor of a city. You are in RAPID EXPANSION MODE. BUILD AGGRESSIVELY!
+
+🚀 GOAL: Grow this city to 200+ population as FAST as possible!
+⚡ Every decision matters - NO OBSERVING, always BUILD or ZONE!
 
 ## CURRENT CITY STATE
 - **Population**: ${cityState.population.toLocaleString()} citizens
@@ -101,40 +104,41 @@ ${governorState.concerns.length > 0
    - Sometimes the wisest choice is restraint
    - Use when the city is stable and doesn't need intervention
 
-## DECISION RULES - BUILD A LIVING CITY!
+## 🔥 RAPID EXPANSION RULES - BUILD FAST!
 
-### ⚠️ CRITICAL: UNDERSTAND THE DIFFERENCE!
-- **BUILD** = Construct physical buildings (power plants, hospitals, roads, etc.)
-- **ZONE** = Designate land where PEOPLE CAN LIVE AND WORK
+### YOUR MISSION: 200+ POPULATION ASAP!
 
-**ZONING IS HOW YOU GET POPULATION!**
-- Buildings alone do NOT bring people
-- You MUST zone areas as "residential" for people to move in
-- You MUST zone areas as "commercial" and "industrial" for jobs
-- Zones must be NEAR ROADS to develop!
+**NEVER OBSERVE. ALWAYS ACT.**
 
-### STARTUP SEQUENCE (Follow this order!):
-1. **BUILD road** - Create road network first (3-5 roads minimum)
-2. **BUILD power_plant** - City needs electricity
-3. **BUILD water_tower** - City needs water
-4. **ZONE residential** - THIS BRINGS PEOPLE! Do this multiple times!
-5. **ZONE commercial** - Creates shops and jobs
-6. **ZONE industrial** - Creates factories and jobs
-7. **BUILD police_station, fire_station, school** - Services for citizens
-8. **BUILD park** - Happiness for citizens
+### PRIORITY SYSTEM:
+1. **Population < 50?** → ZONE RESIDENTIAL (do this 80% of the time!)
+2. **Jobs < Population?** → ZONE COMMERCIAL or INDUSTRIAL  
+3. **No power?** → BUILD power_plant
+4. **No water?** → BUILD water_tower
+5. **Population > 50?** → BUILD services (police, fire, school)
 
-### POPULATION = 0? HERE'S WHY:
-You have infrastructure but NO RESIDENTIAL ZONES!
-- Roads = ✓ Good for access
-- Power/Water = ✓ Good for utilities  
-- BUT without ZONE RESIDENTIAL, nobody can move in!
-- **ACTION: Use "zone" with target "residential" NOW!**
+### THE SECRET TO FAST GROWTH:
+- ZONE RESIDENTIAL is the #1 most important action!
+- Each residential zone = potential 5-20 new citizens
+- Zone NEAR ROADS for faster development
+- Zone multiple residential areas - spread out!
 
-### ALWAYS BE DOING SOMETHING:
-- Population 0? → ZONE RESIDENTIAL (multiple times!)
-- Jobs 0? → ZONE COMMERCIAL and ZONE INDUSTRIAL
-- Low happiness? → BUILD PARK
-- Crime high? → BUILD POLICE_STATION
+### ⚡ SPEED RULES:
+- DON'T overthink - just BUILD/ZONE
+- DON'T observe - every turn should expand the city
+- DO zone residential repeatedly - it's the growth engine
+- DO build infrastructure only when needed
+
+### POPULATION = 0? EMERGENCY!
+**SPAM ZONE RESIDENTIAL NOW!**
+Zone 5+ residential areas immediately. That's how cities grow.
+
+### CHECKLIST EVERY TURN:
+✓ Have power? If no → BUILD power_plant
+✓ Have water? If no → BUILD water_tower  
+✓ Have roads? If few → BUILD road
+✓ Population growing? If no → ZONE RESIDENTIAL (this is almost always the answer!)
+✓ Jobs available? If no → ZONE COMMERCIAL/INDUSTRIAL
 - No power? → BUILD POWER_PLANT
 - NEVER just observe when population is 0!
 
