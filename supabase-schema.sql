@@ -122,6 +122,58 @@ GRANT ALL ON claude_city_disaster_cooldowns TO anon, authenticated;
 GRANT ALL ON claude_city_disaster_log TO anon, authenticated;
 
 -- ============================================
+-- GLOBAL STATE SYNC TABLES
+-- For synchronized simulation across all viewers
+-- ============================================
+
+-- Global game state (single row for the simulation)
+CREATE TABLE IF NOT EXISTS claude_city_global_state (
+  id TEXT NOT NULL,
+  project_id TEXT NOT NULL DEFAULT 'claude_city',
+  state_json TEXT NOT NULL,
+  tick INTEGER DEFAULT 0,
+  population INTEGER DEFAULT 0,
+  happiness INTEGER DEFAULT 50,
+  treasury INTEGER DEFAULT 100000,
+  year INTEGER DEFAULT 2024,
+  month INTEGER DEFAULT 1,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (id, project_id)
+);
+
+-- Leader tracking (who runs the simulation)
+CREATE TABLE IF NOT EXISTS claude_city_leader (
+  project_id TEXT PRIMARY KEY DEFAULT 'claude_city',
+  client_id TEXT NOT NULL,
+  last_heartbeat TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Active viewers
+CREATE TABLE IF NOT EXISTS claude_city_viewers (
+  client_id TEXT NOT NULL,
+  project_id TEXT NOT NULL DEFAULT 'claude_city',
+  last_seen TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (client_id, project_id)
+);
+
+-- Global state indexes
+CREATE INDEX IF NOT EXISTS idx_global_state_updated ON claude_city_global_state(updated_at);
+CREATE INDEX IF NOT EXISTS idx_viewers_last_seen ON claude_city_viewers(last_seen);
+
+-- Enable realtime for global state (important for sync!)
+ALTER PUBLICATION supabase_realtime ADD TABLE claude_city_global_state;
+
+-- Disable RLS for global state
+ALTER TABLE claude_city_global_state DISABLE ROW LEVEL SECURITY;
+ALTER TABLE claude_city_leader DISABLE ROW LEVEL SECURITY;
+ALTER TABLE claude_city_viewers DISABLE ROW LEVEL SECURITY;
+
+-- Grant access for global state
+GRANT ALL ON claude_city_global_state TO anon, authenticated;
+GRANT ALL ON claude_city_leader TO anon, authenticated;
+GRANT ALL ON claude_city_viewers TO anon, authenticated;
+
+-- ============================================
 -- USEFUL QUERIES (for reference)
 -- ============================================
 

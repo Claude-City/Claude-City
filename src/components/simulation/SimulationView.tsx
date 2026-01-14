@@ -11,13 +11,14 @@ import { useGame } from '@/context/GameContext';
 import { useGovernor } from '@/context/GovernorContext';
 import { useClaudeDecisions } from '@/hooks/useClaudeDecisions';
 import { useDisasterEffects } from '@/hooks/useDisasterEffects';
+import { useGlobalSync } from '@/hooks/useGlobalSync';
 import { CanvasIsometricGrid } from '@/components/game/CanvasIsometricGrid';
 import { ClaudeMindPanelSimulation } from './ClaudeMindPanelSimulation';
 import { SimulationStats } from './SimulationStats';
 import { SimulationEventFeed } from './SimulationEventFeed';
 import { DisasterPanel } from './DisasterPanel';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { Brain, Clock } from 'lucide-react';
+import { Brain, Clock, Users, Radio } from 'lucide-react';
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -26,7 +27,10 @@ export function SimulationView() {
   const { isEnabled, setEnabled, forceDecision, governorState } = useGovernor();
   const [navigationTarget, setNavigationTarget] = useState<{ x: number; y: number } | null>(null);
   
-  // Listen for and apply Claude's decisions
+  // Global sync - ensures everyone sees the same simulation
+  const { isLeader, viewerCount } = useGlobalSync();
+  
+  // Listen for and apply Claude's decisions (only leader runs AI)
   useClaudeDecisions();
   
   // Listen for and apply disaster effects
@@ -53,8 +57,13 @@ export function SimulationView() {
     setDayNightMode('day');
     // Start at speed 3 (fastest) - locked, users cannot change
     setSpeed(3);
-    // Enable Claude governor
+    // Enable Claude governor (only leader actually makes API calls)
     setEnabled(true);
+  }, [setSpeed, setEnabled, setDayNightMode]);
+  
+  // Leader only: Make Claude decisions
+  useEffect(() => {
+    if (!isLeader) return;
     
     // Make many decisions at start to build city infrastructure quickly
     const timers = [
@@ -73,7 +82,7 @@ export function SimulationView() {
     return () => {
       timers.forEach(t => clearTimeout(t));
     };
-  }, [setSpeed, setEnabled, forceDecision, setDayNightMode]);
+  }, [isLeader, forceDecision]);
   
   return (
     <TooltipProvider>
@@ -120,10 +129,19 @@ export function SimulationView() {
             </div>
           </div>
           
-          {/* Right - Speed indicator (view only) */}
-          <div className="flex items-center gap-2 text-slate-500 text-sm">
-            <span className="text-slate-400">Speed:</span>
-            <span className="text-cyan-400 font-medium">{state.speed}x</span>
+          {/* Right - Viewer count & status */}
+          <div className="flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-2 text-slate-400">
+              <Users className="w-4 h-4" />
+              <span className="text-white font-medium">{viewerCount}</span>
+              <span className="text-slate-500">watching</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Radio className={`w-3 h-3 ${isLeader ? 'text-green-400' : 'text-cyan-400'}`} />
+              <span className={`text-xs ${isLeader ? 'text-green-400' : 'text-cyan-400'}`}>
+                {isLeader ? 'HOSTING' : 'SYNCED'}
+              </span>
+            </div>
           </div>
         </div>
         
