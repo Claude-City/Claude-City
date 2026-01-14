@@ -101,34 +101,49 @@ ${governorState.concerns.length > 0
    - Sometimes the wisest choice is restraint
    - Use when the city is stable and doesn't need intervention
 
-## DECISION RULES - BUILD A COMPLETE CITY!
-Your PRIMARY GOAL is to create a LIVING, FUNCTIONING city with ALL essential services.
+## DECISION RULES - BUILD A LIVING CITY!
 
-### CITY BUILDING PRIORITY ORDER:
-1. **ROADS FIRST** - Nothing works without roads. Build a road network!
-2. **UTILITIES** - Power plant AND water tower (city dies without these)
-3. **ZONES** - Zone residential, commercial, AND industrial areas near roads
-4. **EMERGENCY SERVICES** - Police station AND fire station (safety!)
-5. **HEALTH & EDUCATION** - Hospital AND school (people need these)
-6. **HAPPINESS** - Parks, stadiums, museums (keep people happy)
-7. **EXPANSION** - More housing, more jobs, grow the economy
+### ⚠️ CRITICAL: UNDERSTAND THE DIFFERENCE!
+- **BUILD** = Construct physical buildings (power plants, hospitals, roads, etc.)
+- **ZONE** = Designate land where PEOPLE CAN LIVE AND WORK
 
-### CRITICAL RULES:
-- If population is 0: ZONE RESIDENTIAL! People need homes!
-- If jobs is 0: ZONE COMMERCIAL and INDUSTRIAL! People need work!
-- If power is 0: BUILD POWER_PLANT immediately!
-- If water is 0: BUILD WATER_TOWER immediately!
-- If police is 0: BUILD POLICE_STATION for safety!
-- If fire is 0: BUILD FIRE_STATION for emergencies!
-- If schools is 0: BUILD SCHOOL for education!
-- If parks is 0: BUILD PARK for happiness!
+**ZONING IS HOW YOU GET POPULATION!**
+- Buildings alone do NOT bring people
+- You MUST zone areas as "residential" for people to move in
+- You MUST zone areas as "commercial" and "industrial" for jobs
+- Zones must be NEAR ROADS to develop!
 
-### ECONOMY:
-- Tax rate affects happiness. Keep it balanced (8-12%).
-- Build generates jobs and attracts population.
-- Services cost money but are ESSENTIAL for a functioning city.
+### STARTUP SEQUENCE (Follow this order!):
+1. **BUILD road** - Create road network first (3-5 roads minimum)
+2. **BUILD power_plant** - City needs electricity
+3. **BUILD water_tower** - City needs water
+4. **ZONE residential** - THIS BRINGS PEOPLE! Do this multiple times!
+5. **ZONE commercial** - Creates shops and jobs
+6. **ZONE industrial** - Creates factories and jobs
+7. **BUILD police_station, fire_station, school** - Services for citizens
+8. **BUILD park** - Happiness for citizens
 
-BE AGGRESSIVE! A city with 0 population is DEAD. Build infrastructure NOW!
+### POPULATION = 0? HERE'S WHY:
+You have infrastructure but NO RESIDENTIAL ZONES!
+- Roads = ✓ Good for access
+- Power/Water = ✓ Good for utilities  
+- BUT without ZONE RESIDENTIAL, nobody can move in!
+- **ACTION: Use "zone" with target "residential" NOW!**
+
+### ALWAYS BE DOING SOMETHING:
+- Population 0? → ZONE RESIDENTIAL (multiple times!)
+- Jobs 0? → ZONE COMMERCIAL and ZONE INDUSTRIAL
+- Low happiness? → BUILD PARK
+- Crime high? → BUILD POLICE_STATION
+- No power? → BUILD POWER_PLANT
+- NEVER just observe when population is 0!
+
+### KEEP ZONING MORE:
+- One residential zone = ~50-200 people max
+- Want 1000 people? Zone 10+ residential areas!
+- Keep zoning residential, commercial, industrial to GROW
+
+BE AGGRESSIVE! Zone residential areas NOW to bring citizens!
 
 ## RESPOND IN THIS EXACT JSON FORMAT:
 {

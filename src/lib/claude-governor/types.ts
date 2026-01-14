@@ -136,12 +136,12 @@ export interface GovernorConfig {
 export function createInitialGovernorState(): ClaudeGovernorState {
   return {
     currentGoals: [
-      'Build roads to create transportation network',
+      'Build roads first - zones need road access',
       'Build power plant and water tower for utilities',
-      'Zone residential, commercial, and industrial areas',
-      'Build police station, fire station, hospital, and school',
-      'Build parks for citizen happiness',
-      'Create a living, functioning city with population and jobs',
+      'ZONE RESIDENTIAL to bring citizens (this is how you get population!)',
+      'ZONE COMMERCIAL and INDUSTRIAL for jobs',
+      'Build services: police, fire, hospital, school',
+      'Keep zoning more areas to grow the city!',
     ],
     observations: [],
     concerns: [],
