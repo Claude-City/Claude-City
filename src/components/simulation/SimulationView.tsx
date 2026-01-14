@@ -62,6 +62,27 @@ export function SimulationView({ initialIsLeader = false }: SimulationViewProps)
     }
   }, [isLeader, setSpeed, setEnabled, setDayNightMode]);
   
+  // Auto-speedup: Double speed every 5 minutes
+  const [currentSpeed, setCurrentSpeed] = useState(5);
+  
+  useEffect(() => {
+    if (!isLeader) return;
+    
+    // Start at speed 5, double every 5 minutes (300 seconds)
+    const speedUpInterval = setInterval(() => {
+      setCurrentSpeed(prev => {
+        const newSpeed = Math.min(prev + 1, 8); // Cap at speed 8
+        console.log(`⚡ AUTO SPEEDUP: ${prev} → ${newSpeed}`);
+        setSpeed(newSpeed);
+        return newSpeed;
+      });
+    }, 5 * 60 * 1000); // Every 5 minutes
+    
+    console.log('⏱️ Auto-speedup enabled: speed increases every 5 minutes');
+    
+    return () => clearInterval(speedUpInterval);
+  }, [isLeader, setSpeed]);
+  
   useEffect(() => {
     if (!isLeader) return;
     

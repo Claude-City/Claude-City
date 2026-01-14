@@ -60,7 +60,7 @@ type GameContextValue = {
   // Canvas should use this instead of state.grid for smooth updates
   latestStateRef: React.RefObject<GameState>;
   setTool: (tool: Tool) => void;
-  setSpeed: (speed: 0 | 1 | 2 | 3 | 4 | 5) => void;
+  setSpeed: (speed: number) => void;
   setTaxRate: (rate: number) => void;
   setActivePanel: (panel: GameState['activePanel']) => void;
   setBudgetFunding: (key: keyof Budget, funding: number) => void;
@@ -824,24 +824,34 @@ export function GameProvider({
       );
 
       // PERF: Fast tick intervals for simulation
-      // Speed 5 = TURBO MODE for rapid city building
-      const speedIntervals: Record<number, number> = {
-        1: 500,  // 2 ticks/sec
-        2: 200,  // 5 ticks/sec
-        3: 100,  // 10 ticks/sec
-        4: 50,   // 20 ticks/sec
-        5: 16,   // 60 ticks/sec - TURBO!
+      // Higher speeds = faster city growth
+      // Speed doubles every level: 5=60fps, 6=120fps, 7=240fps, etc.
+      const getInterval = (speed: number, isMobile: boolean): number => {
+        const baseIntervals: Record<number, number> = {
+          1: 500,  // 2 ticks/sec
+          2: 200,  // 5 ticks/sec
+          3: 100,  // 10 ticks/sec
+          4: 50,   // 20 ticks/sec
+          5: 16,   // 60 ticks/sec
+          6: 8,    // 120 ticks/sec
+          7: 4,    // 250 ticks/sec
+          8: 2,    // 500 ticks/sec - LUDICROUS SPEED!
+        };
+        const mobileIntervals: Record<number, number> = {
+          1: 500,
+          2: 300,
+          3: 150,
+          4: 75,
+          5: 33,
+          6: 16,
+          7: 8,
+          8: 4,
+        };
+        const intervals = isMobile ? mobileIntervals : baseIntervals;
+        // Cap at speed 8, default to fastest if beyond
+        return intervals[Math.min(speed, 8)] || (isMobile ? 4 : 2);
       };
-      const mobileSpeedIntervals: Record<number, number> = {
-        1: 500,
-        2: 300,
-        3: 150,
-        4: 75,
-        5: 33,   // 30 ticks/sec on mobile
-      };
-      const interval = isMobileDevice
-        ? (mobileSpeedIntervals[state.speed] || 33)
-        : (speedIntervals[state.speed] || 16);
+      const interval = getInterval(state.speed, isMobileDevice);
 
       timer = setInterval(() => {
         tickCountRef.current++;
@@ -873,7 +883,7 @@ export function GameProvider({
     setState((prev) => ({ ...prev, selectedTool: tool, activePanel: 'none' }));
   }, []);
 
-  const setSpeed = useCallback((speed: 0 | 1 | 2 | 3 | 4 | 5) => {
+  const setSpeed = useCallback((speed: number) => {
     setState((prev) => ({ ...prev, speed }));
   }, []);
 

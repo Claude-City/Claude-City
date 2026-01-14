@@ -15,7 +15,7 @@ export type GameAction =
   | (BaseAction & { type: 'bulldoze'; x: number; y: number })
   | (BaseAction & { type: 'setTaxRate'; rate: number })
   | (BaseAction & { type: 'setBudget'; key: keyof Budget; funding: number })
-  | (BaseAction & { type: 'setSpeed'; speed: 0 | 1 | 2 | 3 | 4 | 5 })
+  | (BaseAction & { type: 'setSpeed'; speed: number })
   | (BaseAction & { type: 'setDisasters'; enabled: boolean })
   | (BaseAction & { type: 'createBridges'; pathTiles: Array<{ x: number; y: number }>; trackType: 'road' | 'rail' })
   | (BaseAction & { type: 'fullState'; state: GameState })
@@ -27,7 +27,7 @@ export type PlaceBatchAction = { type: 'placeBatch'; placements: Array<{ x: numb
 export type BulldozeAction = { type: 'bulldoze'; x: number; y: number };
 export type SetTaxRateAction = { type: 'setTaxRate'; rate: number };
 export type SetBudgetAction = { type: 'setBudget'; key: keyof Budget; funding: number };
-export type SetSpeedAction = { type: 'setSpeed'; speed: 0 | 1 | 2 | 3 | 4 | 5 };
+export type SetSpeedAction = { type: 'setSpeed'; speed: number };
 export type SetDisastersAction = { type: 'setDisasters'; enabled: boolean };
 export type CreateBridgesAction = { type: 'createBridges'; pathTiles: Array<{ x: number; y: number }>; trackType: 'road' | 'rail' };
 export type FullStateAction = { type: 'fullState'; state: GameState };

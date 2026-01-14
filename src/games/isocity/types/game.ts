@@ -157,7 +157,7 @@ export interface GameState {
   day: number;
   hour: number;
   tick: number;
-  speed: 0 | 1 | 2 | 3 | 4 | 5;
+  speed: number;
   selectedTool: Tool;
   taxRate: number;
   effectiveTaxRate: number;

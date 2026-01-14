@@ -322,7 +322,7 @@ export function useMultiplayerSync() {
   }, [broadcastAction]);
 
   // Helper to broadcast speed change
-  const broadcastSpeed = useCallback((speed: 0 | 1 | 2 | 3 | 4 | 5) => {
+  const broadcastSpeed = useCallback((speed: number) => {
     broadcastAction({ type: 'setSpeed', speed });
   }, [broadcastAction]);
 
