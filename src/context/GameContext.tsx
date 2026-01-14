@@ -823,12 +823,12 @@ export function GameProvider({
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
       );
 
-      // PERF: Balanced tick intervals
-      // Desktop: 500ms, 300ms, 200ms for speeds 1, 2, 3
-      // Mobile: 750ms, 450ms, 300ms for speeds 1, 2, 3
+      // PERF: Fast tick intervals for simulation
+      // Desktop: 500ms, 200ms, 100ms for speeds 1, 2, 3 (1x, 2.5x, 5x)
+      // Mobile: 500ms, 300ms, 150ms for speeds 1, 2, 3
       const interval = isMobileDevice
-        ? (state.speed === 1 ? 750 : state.speed === 2 ? 450 : 300)
-        : (state.speed === 1 ? 500 : state.speed === 2 ? 300 : 200);
+        ? (state.speed === 1 ? 500 : state.speed === 2 ? 300 : 150)
+        : (state.speed === 1 ? 500 : state.speed === 2 ? 200 : 100);
 
       timer = setInterval(() => {
         tickCountRef.current++;

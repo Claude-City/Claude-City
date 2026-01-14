@@ -16,7 +16,7 @@ import { ClaudeMindPanelSimulation } from './ClaudeMindPanelSimulation';
 import { SimulationStats } from './SimulationStats';
 import { SimulationEventFeed } from './SimulationEventFeed';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { Brain, Clock, Users, Radio, Play, FastForward, Pause } from 'lucide-react';
+import { Brain, Clock, Users, Radio, FastForward } from 'lucide-react';
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -61,17 +61,23 @@ export function SimulationView({ initialIsLeader = false }: SimulationViewProps)
   useEffect(() => {
     if (!isLeader) return;
     
+    // Rapid-fire initial decisions to build city quickly
     const timers = [
-      setTimeout(() => forceDecision(), 1000),
-      setTimeout(() => forceDecision(), 3000),
-      setTimeout(() => forceDecision(), 5000),
-      setTimeout(() => forceDecision(), 7000),
-      setTimeout(() => forceDecision(), 9000),
+      setTimeout(() => forceDecision(), 500),
+      setTimeout(() => forceDecision(), 1500),
+      setTimeout(() => forceDecision(), 2500),
+      setTimeout(() => forceDecision(), 3500),
+      setTimeout(() => forceDecision(), 4500),
+      setTimeout(() => forceDecision(), 5500),
+      setTimeout(() => forceDecision(), 6500),
+      setTimeout(() => forceDecision(), 7500),
+      setTimeout(() => forceDecision(), 8500),
+      setTimeout(() => forceDecision(), 9500),
       setTimeout(() => forceDecision(), 11000),
-      setTimeout(() => forceDecision(), 14000),
-      setTimeout(() => forceDecision(), 17000),
-      setTimeout(() => forceDecision(), 20000),
-      setTimeout(() => forceDecision(), 24000),
+      setTimeout(() => forceDecision(), 13000),
+      setTimeout(() => forceDecision(), 15000),
+      setTimeout(() => forceDecision(), 18000),
+      setTimeout(() => forceDecision(), 22000),
     ];
     
     return () => timers.forEach(t => clearTimeout(t));
@@ -122,29 +128,11 @@ export function SimulationView({ initialIsLeader = false }: SimulationViewProps)
           
           {/* Right - Controls & Status */}
           <div className="flex items-center gap-3">
-            {/* Host Speed Controls */}
-            {isLeader && (
-              <div className="flex items-center gap-0.5 bg-white/5 rounded-lg p-0.5">
-                {[
-                  { speed: 0, icon: Pause },
-                  { speed: 1, icon: Play },
-                  { speed: 2, icon: FastForward },
-                  { speed: 3, icon: FastForward },
-                ].map(({ speed, icon: Icon }) => (
-                  <button
-                    key={speed}
-                    onClick={() => setSpeed(speed as 0 | 1 | 2 | 3)}
-                    className={`p-1.5 rounded transition-all ${
-                      state.speed === speed 
-                        ? 'bg-white/10 text-white' 
-                        : 'text-white/40 hover:text-white/60'
-                    }`}
-                  >
-                    <Icon className="w-3 h-3" />
-                  </button>
-                ))}
-              </div>
-            )}
+            {/* Speed indicator */}
+            <div className="flex items-center gap-1.5 text-white/30 text-xs">
+              <FastForward className="w-3 h-3" />
+              <span>5x</span>
+            </div>
             
             {/* Viewers */}
             <div className="flex items-center gap-1.5 text-white/40 text-xs">

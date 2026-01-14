@@ -57,7 +57,7 @@ export function GovernorProvider({ children }: { children: React.ReactNode }) {
   const [config, setConfig] = useState<GovernorConfig>({
     ...DEFAULT_CONFIG,
     apiKey: CLAUDE_API_KEY,
-    decisionInterval: 10, // Very fast decisions - build city quickly!
+    decisionInterval: 5, // Ultra fast decisions - aggressive city building!
   });
   const [isEnabled, setIsEnabled] = useState(true);
   
