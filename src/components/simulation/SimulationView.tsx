@@ -148,12 +148,12 @@ export function SimulationView() {
               }}
             />
             
-            {/* Thinking Overlay */}
+            {/* Thinking Indicator - subtle, doesn't block view */}
             {governorState.isThinking && (
-              <div className="absolute inset-0 bg-slate-950/30 flex items-center justify-center pointer-events-none">
-                <div className="bg-slate-900/90 border border-cyan-500/30 rounded-lg px-6 py-4 flex items-center gap-3">
-                  <Brain className="w-6 h-6 text-cyan-400 animate-pulse" />
-                  <span className="text-cyan-300">Claude is thinking...</span>
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
+                <div className="bg-slate-900/80 border border-cyan-500/30 rounded-full px-4 py-2 flex items-center gap-2 shadow-lg">
+                  <Brain className="w-4 h-4 text-cyan-400 animate-pulse" />
+                  <span className="text-cyan-300 text-sm">Claude is thinking...</span>
                 </div>
               </div>
             )}
