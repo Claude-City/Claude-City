@@ -17,9 +17,11 @@ let realtimeChannel: RealtimeChannel | null = null;
 
 function getSupabaseClient(): SupabaseClient | null {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    console.warn('⚠️ Supabase not configured. URL:', !!SUPABASE_URL, 'KEY:', !!SUPABASE_ANON_KEY);
     return null;
   }
   if (!supabaseClient) {
+    console.log('🔌 Creating Supabase client...');
     supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
   return supabaseClient;
@@ -139,9 +141,13 @@ function getClientId(): string {
 // Save global state (leader only)
 export async function saveGlobalState(state: GameState): Promise<boolean> {
   const client = getSupabaseClient();
-  if (!client) return false;
+  if (!client) {
+    console.log('❌ Cannot save - no Supabase client');
+    return false;
+  }
 
   const compressed = compressState(state);
+  console.log('💾 Saving global state... Tick:', state.tick, 'Pop:', state.stats.population);
 
   try {
     const { error } = await client
@@ -161,8 +167,15 @@ export async function saveGlobalState(state: GameState): Promise<boolean> {
         onConflict: 'id,project_id',
       });
 
-    return !error;
-  } catch {
+    if (error) {
+      console.error('❌ Save error:', error.message);
+      return false;
+    }
+    
+    console.log('✅ Saved to global!');
+    return true;
+  } catch (err) {
+    console.error('❌ Save exception:', err);
     return false;
   }
 }
@@ -170,9 +183,13 @@ export async function saveGlobalState(state: GameState): Promise<boolean> {
 // Load global state (followers)
 export async function loadGlobalState(): Promise<GameState | null> {
   const client = getSupabaseClient();
-  if (!client) return null;
+  if (!client) {
+    console.log('❌ No Supabase client - check env vars');
+    return null;
+  }
 
   try {
+    console.log('🔍 Loading global state from Supabase...');
     const { data, error } = await client
       .from('claude_city_global_state')
       .select('*')
@@ -180,10 +197,24 @@ export async function loadGlobalState(): Promise<GameState | null> {
       .eq('project_id', PROJECT_ID)
       .single();
 
-    if (error || !data) return null;
+    if (error) {
+      console.log('⚠️ Supabase query error:', error.message);
+      return null;
+    }
+    
+    if (!data) {
+      console.log('📭 No global state found in database');
+      return null;
+    }
 
-    return decompressState(data.state_json);
-  } catch {
+    console.log('✅ Found global state! Tick:', data.tick, 'Pop:', data.population);
+    const state = decompressState(data.state_json);
+    if (!state) {
+      console.log('❌ Failed to decompress state');
+    }
+    return state;
+  } catch (err) {
+    console.error('❌ Load error:', err);
     return null;
   }
 }
