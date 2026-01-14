@@ -2,102 +2,179 @@
 
 /**
  * Global Simulation Loader
- * Ensures everyone sees the SAME simulation by loading global state first
+ * MANDATORY global sync - waits until connected, no local fallback
+ * Everyone sees the SAME simulation or nothing
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { GameProvider } from '@/context/GameContext';
 import { GovernorProvider } from '@/context/GovernorContext';
 import { SimulationView } from './SimulationView';
 import { loadGlobalState, saveGlobalState, checkLeadership } from '@/lib/global-state';
 import { GameState } from '@/types/game';
 import { generateRandomAdvancedCity, DEFAULT_GRID_SIZE } from '@/lib/simulation';
-import { Brain, Loader2 } from 'lucide-react';
+import { Brain, Loader2, Wifi, WifiOff } from 'lucide-react';
+
+type LoadingStatus = 
+  | 'connecting'
+  | 'loading'
+  | 'creating'
+  | 'saving'
+  | 'waiting'
+  | 'retrying'
+  | 'ready'
+  | 'error';
 
 export function GlobalSimulationLoader() {
   const [initialState, setInitialState] = useState<GameState | null>(null);
   const [isLeader, setIsLeader] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<LoadingStatus>('connecting');
+  const [retryCount, setRetryCount] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
+    
     async function initializeSimulation() {
-      try {
-        console.log('🌐 Checking for global simulation...');
-        
-        // Try to load existing global state
-        const globalState = await loadGlobalState();
-        
-        if (globalState && globalState.tick > 0) {
-          // Found existing simulation - use it
-          console.log('📡 Found global simulation! Population:', globalState.stats.population, 'Tick:', globalState.tick);
-          setInitialState(globalState);
-          setIsLeader(false);
-        } else {
-          // No global state - check if we should be leader
+      const MAX_RETRIES = 30; // Try for 60 seconds (2s intervals)
+      
+      while (mountedRef.current && retryCount < MAX_RETRIES) {
+        try {
+          setStatus('loading');
+          console.log(`🌐 Attempt ${retryCount + 1}: Checking for global simulation...`);
+          
+          // Try to load existing global state
+          const globalState = await loadGlobalState();
+          
+          if (globalState && globalState.tick > 0) {
+            // Found existing simulation - use it!
+            console.log('📡 Connected to global simulation! Pop:', globalState.stats.population);
+            setInitialState(globalState);
+            setIsLeader(false);
+            setStatus('ready');
+            return; // Success!
+          }
+          
+          // No global state exists yet
+          setStatus('creating');
+          console.log('📭 No global simulation found, checking leadership...');
+          
           const { isLeader: shouldLead } = await checkLeadership();
           
           if (shouldLead) {
-            // We're the first one - create new city and save it
-            console.log('🆕 No simulation exists. Creating new city as LEADER...');
+            // We're the leader - create and save new city
+            console.log('👑 Becoming leader, creating new simulation...');
+            setStatus('saving');
+            
             const newCity = generateRandomAdvancedCity(DEFAULT_GRID_SIZE, 'Claude City');
-            
-            // Save to global immediately
             const saved = await saveGlobalState(newCity);
-            console.log('💾 Saved new city to global:', saved);
             
-            setInitialState(newCity);
-            setIsLeader(true);
-          } else {
-            // Someone else is leader but no state yet - wait and retry
-            console.log('⏳ Waiting for leader to create simulation...');
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            const retryState = await loadGlobalState();
-            if (retryState) {
-              setInitialState(retryState);
-              setIsLeader(false);
-            } else {
-              // Still nothing - create locally
-              console.log('⚠️ No global state available, creating local simulation');
-              setInitialState(generateRandomAdvancedCity(DEFAULT_GRID_SIZE, 'Claude City'));
+            if (saved) {
+              console.log('✅ New simulation created and saved!');
+              setInitialState(newCity);
               setIsLeader(true);
+              setStatus('ready');
+              return; // Success!
+            } else {
+              console.log('❌ Failed to save, will retry...');
             }
+          } else {
+            // Not leader, wait for leader to create simulation
+            console.log('⏳ Waiting for leader to create simulation...');
+            setStatus('waiting');
           }
+          
+          // Wait before retrying
+          setStatus('retrying');
+          setRetryCount(prev => prev + 1);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+        } catch (err) {
+          console.error('❌ Connection error:', err);
+          setErrorMessage(err instanceof Error ? err.message : 'Connection failed');
+          setStatus('retrying');
+          setRetryCount(prev => prev + 1);
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
-      } catch (err) {
-        console.error('❌ Error initializing simulation:', err);
-        setError('Failed to connect to global simulation. Starting local...');
-        // Fallback to local
-        setInitialState(generateRandomAdvancedCity(DEFAULT_GRID_SIZE, 'Claude City'));
-        setIsLeader(true);
-      } finally {
-        setIsLoading(false);
+      }
+      
+      // Max retries reached
+      if (mountedRef.current) {
+        setStatus('error');
+        setErrorMessage('Could not connect to global simulation after 60 seconds');
       }
     }
 
     initializeSimulation();
-  }, []);
+    
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []); // Only run once on mount
 
-  if (isLoading) {
+  // Loading screen with status
+  if (status !== 'ready') {
+    const statusMessages: Record<LoadingStatus, string> = {
+      connecting: 'Connecting to server...',
+      loading: 'Loading global simulation...',
+      creating: 'Creating new simulation...',
+      saving: 'Saving to cloud...',
+      waiting: 'Waiting for simulation host...',
+      retrying: `Retrying... (${retryCount}/30)`,
+      ready: 'Ready!',
+      error: errorMessage || 'Connection failed',
+    };
+
+    const isError = status === 'error';
+
     return (
       <div className="w-full h-screen bg-slate-950 flex flex-col items-center justify-center">
         <div className="flex flex-col items-center gap-6">
           <div className="relative">
-            <Brain className="w-16 h-16 text-cyan-400" />
-            <Loader2 className="w-8 h-8 text-cyan-300 animate-spin absolute -bottom-1 -right-1" />
+            <Brain className="w-20 h-20 text-cyan-400" />
+            {!isError ? (
+              <Loader2 className="w-10 h-10 text-cyan-300 animate-spin absolute -bottom-2 -right-2" />
+            ) : (
+              <WifiOff className="w-10 h-10 text-red-400 absolute -bottom-2 -right-2" />
+            )}
           </div>
+          
           <div className="text-center">
-            <h1 className="text-2xl font-light text-white mb-2">Claude City</h1>
-            <p className="text-slate-400">Connecting to global simulation...</p>
+            <h1 className="text-3xl font-light text-white mb-3">Claude City</h1>
+            <p className={`text-lg ${isError ? 'text-red-400' : 'text-slate-400'}`}>
+              {statusMessages[status]}
+            </p>
+            
+            {!isError && (
+              <div className="mt-4 flex items-center justify-center gap-2 text-slate-500">
+                <Wifi className="w-4 h-4 animate-pulse" />
+                <span className="text-sm">Syncing with global simulation</span>
+              </div>
+            )}
+            
+            {isError && (
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-6 px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-colors"
+              >
+                Retry Connection
+              </button>
+            )}
           </div>
+          
+          {/* Progress bar */}
+          {!isError && (
+            <div className="w-64 h-1 bg-slate-800 rounded-full overflow-hidden mt-4">
+              <div 
+                className="h-full bg-cyan-500 transition-all duration-500"
+                style={{ width: `${Math.min((retryCount / 30) * 100 + 10, 95)}%` }}
+              />
+            </div>
+          )}
         </div>
       </div>
     );
-  }
-
-  if (error) {
-    console.warn(error);
   }
 
   if (!initialState) {

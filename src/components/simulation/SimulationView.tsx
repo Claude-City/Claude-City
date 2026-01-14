@@ -56,15 +56,23 @@ export function SimulationView({ initialIsLeader = false }: SimulationViewProps)
     };
   }, []);
   
-  // Auto-start the simulation - runs continuously, no user control
+  // Auto-start the simulation - behavior depends on leader status
   useEffect(() => {
     // Force daytime - no dark/grey screen
     setDayNightMode('day');
-    // Start at speed 3 (fastest) - locked, users cannot change
-    setSpeed(3);
-    // Enable Claude governor (only leader actually makes API calls)
-    setEnabled(true);
-  }, [setSpeed, setEnabled, setDayNightMode]);
+    
+    if (isLeader) {
+      // Leader: runs simulation at full speed
+      setSpeed(3);
+      setEnabled(true);
+      console.log('👑 Running as LEADER - simulation active');
+    } else {
+      // Follower: PAUSE local simulation - only receive updates from global
+      setSpeed(0);
+      setEnabled(false);
+      console.log('👁️ Running as VIEWER - receiving updates from leader');
+    }
+  }, [isLeader, setSpeed, setEnabled, setDayNightMode]);
   
   // Leader only: Make Claude decisions
   useEffect(() => {
