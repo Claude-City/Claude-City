@@ -1,0 +1,106 @@
+-- ============================================
+-- CLAUDE CITY GOVERNANCE SIMULATION
+-- Database Schema v1.0
+-- 
+-- Project: claude_city
+-- Tables are prefixed with 'claude_city_' to avoid
+-- conflicts with other projects in the same database
+-- ============================================
+
+-- Drop existing tables if recreating (uncomment if needed)
+-- DROP TABLE IF EXISTS claude_city_decisions CASCADE;
+-- DROP TABLE IF EXISTS claude_city_sessions CASCADE;
+
+-- ============================================
+-- SESSIONS TABLE
+-- Tracks each simulation session
+-- ============================================
+CREATE TABLE IF NOT EXISTS claude_city_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  city_id TEXT NOT NULL,
+  city_name TEXT DEFAULT 'Claude City',
+  started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  ended_at TIMESTAMPTZ,
+  total_decisions INTEGER DEFAULT 0,
+  total_interventions INTEGER DEFAULT 0,
+  total_restraints INTEGER DEFAULT 0,
+  governance_style TEXT DEFAULT 'emerging',
+  final_population INTEGER,
+  final_happiness INTEGER,
+  final_treasury INTEGER,
+  project_id TEXT DEFAULT 'claude_city' -- Project identifier for filtering
+);
+
+-- ============================================
+-- DECISIONS TABLE
+-- Records each decision Claude makes
+-- ============================================
+CREATE TABLE IF NOT EXISTS claude_city_decisions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_id UUID REFERENCES claude_city_sessions(id) ON DELETE CASCADE,
+  city_id TEXT NOT NULL,
+  tick INTEGER NOT NULL,
+  game_year INTEGER,
+  game_month INTEGER,
+  decision_type TEXT NOT NULL,
+  decision_target TEXT,
+  decision_amount INTEGER,
+  reasoning TEXT,
+  observation TEXT,
+  concern TEXT,
+  goal TEXT,
+  city_population INTEGER,
+  city_happiness INTEGER,
+  city_treasury INTEGER,
+  city_era TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  project_id TEXT DEFAULT 'claude_city' -- Project identifier for filtering
+);
+
+-- ============================================
+-- INDEXES
+-- For query performance
+-- ============================================
+CREATE INDEX IF NOT EXISTS idx_cc_sessions_city ON claude_city_sessions(city_id);
+CREATE INDEX IF NOT EXISTS idx_cc_sessions_project ON claude_city_sessions(project_id);
+CREATE INDEX IF NOT EXISTS idx_cc_sessions_started ON claude_city_sessions(started_at);
+
+CREATE INDEX IF NOT EXISTS idx_cc_decisions_session ON claude_city_decisions(session_id);
+CREATE INDEX IF NOT EXISTS idx_cc_decisions_city ON claude_city_decisions(city_id);
+CREATE INDEX IF NOT EXISTS idx_cc_decisions_created ON claude_city_decisions(created_at);
+CREATE INDEX IF NOT EXISTS idx_cc_decisions_project ON claude_city_decisions(project_id);
+CREATE INDEX IF NOT EXISTS idx_cc_decisions_type ON claude_city_decisions(decision_type);
+
+-- ============================================
+-- DISABLE ROW LEVEL SECURITY
+-- Open access for the simulation
+-- ============================================
+ALTER TABLE claude_city_sessions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE claude_city_decisions DISABLE ROW LEVEL SECURITY;
+
+-- ============================================
+-- GRANT PERMISSIONS
+-- Allow anon and authenticated users full access
+-- ============================================
+GRANT ALL ON claude_city_sessions TO anon, authenticated;
+GRANT ALL ON claude_city_decisions TO anon, authenticated;
+
+-- ============================================
+-- USEFUL QUERIES (for reference)
+-- ============================================
+
+-- Get all sessions for this project:
+-- SELECT * FROM claude_city_sessions WHERE project_id = 'claude_city' ORDER BY started_at DESC;
+
+-- Get decisions for a session:
+-- SELECT * FROM claude_city_decisions WHERE session_id = 'your-session-id' ORDER BY created_at DESC;
+
+-- Get decision type distribution:
+-- SELECT decision_type, COUNT(*) FROM claude_city_decisions WHERE project_id = 'claude_city' GROUP BY decision_type;
+
+-- Get governance style over time:
+-- SELECT governance_style, COUNT(*) FROM claude_city_sessions WHERE project_id = 'claude_city' GROUP BY governance_style;
+
+-- ============================================
+-- END CLAUDE CITY SCHEMA
+-- ============================================
