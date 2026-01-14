@@ -88,17 +88,33 @@ export function useGlobalSync() {
         // Register as viewer
         await registerViewer();
         
-        // Check leadership
-        const isLeader = await checkAndClaimLeadership();
+        // ALWAYS try to load global state first
+        // This ensures everyone syncs to the same state
+        const globalState = await loadGlobalState();
         
-        if (!isLeader) {
-          // Follower - try to load global state
-          const loaded = await loadFromGlobal();
-          if (!loaded) {
-            // No global state available, become leader
+        if (globalState && globalState.tick > 0) {
+          // Global state exists - load it and become follower
+          console.log('📡 Found existing global simulation, syncing...');
+          loadState(JSON.stringify(globalState));
+          isLeaderRef.current = false;
+          setSyncState(prev => ({ ...prev, isLeader: false, lastSync: Date.now() }));
+          
+          // Check if we should take over as leader
+          const { isLeader } = await checkAndClaimLeadership();
+          if (isLeader) {
+            console.log('👑 Becoming leader of the simulation');
             isLeaderRef.current = true;
             setSyncState(prev => ({ ...prev, isLeader: true }));
           }
+        } else {
+          // No global state - we're the first one, become leader
+          console.log('🆕 No existing simulation, starting as leader');
+          await checkAndClaimLeadership();
+          isLeaderRef.current = true;
+          setSyncState(prev => ({ ...prev, isLeader: true }));
+          
+          // Save initial state immediately
+          await saveGlobalState(state);
         }
         
         // Get viewer count
@@ -106,7 +122,7 @@ export function useGlobalSync() {
         setSyncState(prev => ({ ...prev, viewerCount: count }));
       } catch (error) {
         // Supabase not available - run locally as leader
-        console.log('Global sync not available, running locally');
+        console.log('⚠️ Global sync not available, running locally');
         supabaseAvailable.current = false;
         isLeaderRef.current = true;
         setSyncState(prev => ({ ...prev, isLeader: true }));
@@ -114,19 +130,19 @@ export function useGlobalSync() {
     };
 
     init();
-  }, [checkAndClaimLeadership, loadFromGlobal]);
+  }, [checkAndClaimLeadership, loadState, state]);
 
-  // Leader: Save state periodically
+  // Leader: Save state frequently for real-time sync
   useEffect(() => {
     if (!isLeaderRef.current) return;
 
-    // Save every 5 seconds or every 50 ticks
+    // Save every 2 seconds for smooth sync
     const saveInterval = setInterval(() => {
       saveToGlobal();
-    }, 5000);
+    }, 2000);
 
-    // Also save on significant tick changes
-    if (state.tick - lastSaveTickRef.current >= 50) {
+    // Also save on every 20 tick changes
+    if (state.tick - lastSaveTickRef.current >= 20) {
       saveToGlobal();
     }
 
@@ -144,17 +160,35 @@ export function useGlobalSync() {
     return () => clearInterval(heartbeatInterval);
   }, []);
 
-  // Follower: Subscribe to real-time updates
+  // Follower: Subscribe to real-time updates + polling fallback
   useEffect(() => {
     if (isLeaderRef.current) return;
 
+    // Realtime subscription
     const unsubscribe = subscribeToStateUpdates((newState) => {
       if (newState.tick > state.tick) {
         loadState(JSON.stringify(newState));
+        setSyncState(prev => ({ ...prev, lastSync: Date.now() }));
       }
     });
+    
+    // Also poll every 3 seconds as fallback (realtime can be unreliable)
+    const pollInterval = setInterval(async () => {
+      try {
+        const globalState = await loadGlobalState();
+        if (globalState && globalState.tick > state.tick) {
+          loadState(JSON.stringify(globalState));
+          setSyncState(prev => ({ ...prev, lastSync: Date.now() }));
+        }
+      } catch {
+        // Ignore polling errors
+      }
+    }, 3000);
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+      clearInterval(pollInterval);
+    };
   }, [state.tick, loadState]);
 
   // Update viewer count periodically
