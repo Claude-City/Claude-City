@@ -170,14 +170,25 @@ Build a futuristic city:
 - Beautiful road network
 - Mix of buildings and green spaces
 
-### ⚠️ RULES:
-- ALWAYS take action - never just observe unless city is perfect
-- Build roads BEFORE zoning nearby areas
-- Balance residential with commercial/industrial (people need jobs!)
-- Don't neglect services - they keep citizens happy
-- Expand outward systematically
+### ⚠️ CRITICAL RULES:
+- **NEVER USE "observe"** - there is always something to build!
+- Build roads to create a network
+- Zone residential to bring people
+- Build services to keep them happy
+- ALWAYS pick: build, zone, tax, or allocate
 
-BE AGGRESSIVE! Zone residential areas NOW to bring citizens!
+### 🚨 FORBIDDEN:
+- type: "observe" is BANNED
+- You MUST pick build or zone 90% of the time
+- If unsure, default to: zone residential
+
+### QUICK DECISION GUIDE:
+- Population 0? → zone residential
+- Few roads? → build road  
+- No power? → build power_plant
+- No water? → build water_tower
+- Population > 50? → build school or police_station
+- Otherwise? → zone residential (you can never have too much!)
 
 ## RESPOND IN THIS EXACT JSON FORMAT:
 {
@@ -270,7 +281,22 @@ export async function askClaudeToGovern(
       return null;
     }
     
-    return parseClaudeResponse(textContent.text);
+    console.log('📨 Raw Claude response:', textContent.text.substring(0, 500));
+    const parsed = parseClaudeResponse(textContent.text);
+    
+    if (parsed) {
+      console.log('✅ Parsed decision:', parsed.decision.type, parsed.decision.target);
+      
+      // If Claude said observe, force it to zone residential instead!
+      if (parsed.decision.type === 'observe') {
+        console.warn('⚠️ Claude tried to observe - forcing zone residential!');
+        parsed.decision.type = 'zone';
+        parsed.decision.target = 'residential';
+        parsed.reasoning = 'Forced to zone residential instead of observing';
+      }
+    }
+    
+    return parsed;
   } catch (error) {
     console.error('Failed to get Claude response:', error);
     return null;
