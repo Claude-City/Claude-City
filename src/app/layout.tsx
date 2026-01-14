@@ -69,20 +69,25 @@ export default async function RootLayout({ children }: {children: React.ReactNod
   <html className={`dark ${playfair.variable} ${dmSans.variable}`} lang={await getLocale()}>
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
-        <link rel="apple-touch-icon" href="/icon.png" />
+        {/* Favicon and icons */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/site.webmanifest" />
         {/* Preload critical game assets - WebP for browsers that support it */}
         <link
-        rel="preload"
-        href="/assets/sprites_red_water_new.webp"
-        as="image"
-        type="image/webp" />
-
+          rel="preload"
+          href="/assets/sprites_red_water_new.webp"
+          as="image"
+          type="image/webp" 
+        />
         <link
-        rel="preload"
-        href="/assets/water.webp"
-        as="image"
-        type="image/webp" />
-
+          rel="preload"
+          href="/assets/water.webp"
+          as="image"
+          type="image/webp" 
+        />
       </head>
       <body className="bg-background text-foreground antialiased font-sans overflow-hidden"><GTProvider>{children}<Analytics /></GTProvider></body>
     </html>

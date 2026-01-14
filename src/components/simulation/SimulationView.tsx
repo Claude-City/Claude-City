@@ -80,9 +80,13 @@ export function SimulationView() {
       <div className="w-full h-screen overflow-hidden bg-slate-950 flex flex-col">
         {/* Top Bar */}
         <div className="h-14 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between px-4 z-50">
-          {/* Left - Title */}
+          {/* Left - Title with Logo */}
           <div className="flex items-center gap-3">
-            <Brain className={`w-6 h-6 ${isEnabled ? 'text-cyan-400 animate-pulse' : 'text-slate-500'}`} />
+            <img 
+              src="/logo.png" 
+              alt="Claude City" 
+              className={`w-8 h-8 ${isEnabled ? 'animate-pulse' : 'opacity-50'}`}
+            />
             <h1 className="text-xl font-light tracking-wide text-white/90">
               Claude City
             </h1>
