@@ -84,6 +84,7 @@ type GameContextValue = {
   isSaving: boolean;
   addMoney: (amount: number) => void;
   addNotification: (title: string, description: string, icon: string) => void;
+  applyDisasterEffects: (effects: { populationLoss: number; moneyLoss: number; happinessLoss: number; buildingsToAbandon: number }) => void;
   // Sprite pack management
   currentSpritePack: SpritePack;
   availableSpritePacks: SpritePack[];
@@ -1451,6 +1452,56 @@ export function GameProvider({ children, startFresh = false }: { children: React
     });
   }, []);
 
+  // Apply disaster effects to the city
+  const applyDisasterEffects = useCallback((effects: { 
+    populationLoss: number; 
+    moneyLoss: number; 
+    happinessLoss: number; 
+    buildingsToAbandon: number 
+  }) => {
+    setState((prev) => {
+      const newGrid = prev.grid.map(row => row.map(tile => ({ ...tile })));
+      
+      // Find developed tiles that can be damaged
+      const developedTiles: { x: number; y: number }[] = [];
+      newGrid.forEach((row, y) => {
+        row.forEach((tile, x) => {
+          if (tile.building.type !== 'grass' && 
+              tile.building.type !== 'water' && 
+              tile.building.type !== 'empty' &&
+              tile.building.type !== 'road' &&
+              !tile.building.abandoned) {
+            developedTiles.push({ x, y });
+          }
+        });
+      });
+      
+      // Randomly abandon some buildings
+      const shuffled = developedTiles.sort(() => Math.random() - 0.5);
+      const toAbandon = shuffled.slice(0, Math.min(effects.buildingsToAbandon, developedTiles.length));
+      
+      toAbandon.forEach(({ x, y }) => {
+        const tile = newGrid[y][x];
+        tile.building = {
+          ...tile.building,
+          abandoned: true,
+          onFire: Math.random() > 0.5, // 50% chance of fire
+        };
+      });
+      
+      return {
+        ...prev,
+        grid: newGrid,
+        stats: {
+          ...prev.stats,
+          population: Math.max(0, prev.stats.population - effects.populationLoss),
+          money: Math.max(0, prev.stats.money - effects.moneyLoss),
+          happiness: Math.max(0, prev.stats.happiness - effects.happinessLoss),
+        },
+      };
+    });
+  }, []);
+
   // Save current city for restore (when viewing shared cities)
   const saveCurrentCityForRestore = useCallback(() => {
     saveCityForRestore(state);
@@ -1656,6 +1707,7 @@ export function GameProvider({ children, startFresh = false }: { children: React
     isSaving,
     addMoney,
     addNotification,
+    applyDisasterEffects,
     // Sprite pack management
     currentSpritePack,
     availableSpritePacks: SPRITE_PACKS,
