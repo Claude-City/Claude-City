@@ -11,6 +11,7 @@ import { useGovernor } from '@/context/GovernorContext';
 import { useClaudeDecisions } from '@/hooks/useClaudeDecisions';
 import { useDisasterEffects } from '@/hooks/useDisasterEffects';
 import { useGlobalSync } from '@/hooks/useGlobalSync';
+import { resetGlobalState } from '@/lib/global-state';
 import { CanvasIsometricGrid } from '@/components/game/CanvasIsometricGrid';
 import { ClaudeMindPanelSimulation } from './ClaudeMindPanelSimulation';
 import { SimulationStats } from './SimulationStats';
@@ -36,12 +37,17 @@ export function SimulationView({ initialIsLeader = false }: SimulationViewProps)
   
   // Secret reset: Press Ctrl+Shift+X to completely reset the simulation
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = async (e: KeyboardEvent) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'X') {
         if (confirm('🔄 Reset the entire simulation? This will clear everything and start fresh!')) {
           console.log('🧹 Resetting simulation...');
+          
+          // Clear Supabase global state
+          await resetGlobalState();
+          
           // Clear all localStorage
           localStorage.clear();
+          
           // Reload to trigger fresh start
           window.location.reload();
         }

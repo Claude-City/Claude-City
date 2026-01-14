@@ -12,7 +12,7 @@ import { GovernorProvider } from '@/context/GovernorContext';
 import { SimulationView } from './SimulationView';
 import { loadGlobalState, saveGlobalState, checkLeadership } from '@/lib/global-state';
 import { GameState } from '@/types/game';
-import { generateRandomAdvancedCity, DEFAULT_GRID_SIZE } from '@/lib/simulation';
+import { createInitialGameState, DEFAULT_GRID_SIZE } from '@/lib/simulation';
 import { Brain, Loader2, Wifi, WifiOff } from 'lucide-react';
 import '@/styles/theme.css';
 
@@ -64,11 +64,12 @@ export function GlobalSimulationLoader() {
           const { isLeader: shouldLead } = await checkLeadership();
           
           if (shouldLead) {
-            // We're the host - create and save new city
-            console.log('🖥️ Becoming HOST - this browser will run Claude...');
+            // We're the host - create EMPTY city for Claude to build from scratch!
+            console.log('🖥️ Becoming HOST - creating EMPTY city for Claude to build...');
             setStatus('saving');
             
-            const newCity = generateRandomAdvancedCity(DEFAULT_GRID_SIZE, 'Claude City');
+            // Start with completely empty terrain - Claude builds everything!
+            const newCity = createInitialGameState(DEFAULT_GRID_SIZE, 'Claude City');
             const saved = await saveGlobalState(newCity);
             
             if (saved) {

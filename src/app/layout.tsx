@@ -22,13 +22,13 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL('https://claude-city.com'),
   title: {
-    default: 'Claude City — AI Governor Simulation',
-    template: 'Claude City — %s',
+    default: 'Claude City',
+    template: '%s | Claude City',
   },
-  description: 'Watch an AI build a city from scratch. Claude City is an autonomous city-building simulation where Claude (AI) acts as the governor, making all decisions about zoning, building, taxes, and resource allocation.',
+  description: 'Watch Claude build a city from scratch. Live simulation.',
   openGraph: {
-    title: 'Claude City — AI Governor Simulation',
-    description: 'Watch an AI build a city from scratch. Claude autonomously governs the city while you spectate.',
+    title: 'Claude City',
+    description: 'Watch Claude build a city from scratch.',
     type: 'website',
     siteName: 'Claude City',
     images: [
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
         width: 1179,
         height: 1406,
         type: 'image/png',
-        alt: 'Claude City - AI governed city simulation'
+        alt: 'Claude City'
       }
     ],
   },

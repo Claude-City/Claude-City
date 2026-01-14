@@ -297,6 +297,43 @@ export async function registerViewer(): Promise<void> {
   }
 }
 
+// Reset global state - clears everything for a fresh start
+export async function resetGlobalState(): Promise<boolean> {
+  const client = getSupabaseClient();
+  if (!client) {
+    console.log('⚠️ No Supabase client - cannot reset server state');
+    return false;
+  }
+
+  try {
+    console.log('🧹 Clearing global state from Supabase...');
+    
+    // Delete global state
+    await client
+      .from('claude_city_global_state')
+      .delete()
+      .eq('project_id', PROJECT_ID);
+    
+    // Delete leader
+    await client
+      .from('claude_city_leader')
+      .delete()
+      .eq('project_id', PROJECT_ID);
+    
+    // Delete viewers
+    await client
+      .from('claude_city_viewers')
+      .delete()
+      .eq('project_id', PROJECT_ID);
+    
+    console.log('✅ Global state cleared!');
+    return true;
+  } catch (error) {
+    console.error('❌ Failed to reset global state:', error);
+    return false;
+  }
+}
+
 // SQL to create the tables
 export const GLOBAL_STATE_TABLES_SQL = `
 -- Global game state (single row for the simulation)
